@@ -39,6 +39,7 @@ const _meta = {
  * A dropdown allows a user to select a value from a series of options.
  * @see Form
  * @see Select
+ * @see Menu
  */
 export default class Dropdown extends Component {
   static propTypes = {
@@ -83,6 +84,13 @@ export default class Dropdown extends Component {
 
     /** Whether or not the menu should close when the dropdown is blurred. */
     closeOnBlur: PropTypes.bool,
+
+    /**
+     * Whether or not the menu should close when a value is selected from the dropdown.
+     * By default, multiple selection dropdowns will remain open on change, while single
+     * selection dropdowns will close on change.
+     */
+    closeOnChange: PropTypes.bool,
 
     /** A compact dropdown has no minimum width. */
     compact: PropTypes.bool,
@@ -136,7 +144,8 @@ export default class Dropdown extends Component {
     /** A dropdown can be labeled. */
     labeled: PropTypes.bool,
 
-    // linkItem: PropTypes.bool,
+    /** A dropdown can be formatted as a Menu item. */
+    item: PropTypes.bool,
 
     /** A dropdown can show that it is currently loading data. */
     loading: PropTypes.bool,
@@ -413,14 +422,14 @@ export default class Dropdown extends Component {
       } else {
         document.addEventListener('keydown', this.moveSelectionOnKeyDown)
         document.addEventListener('keydown', this.selectItemOnEnter)
-        document.addEventListener('keydown', this.removeItemOnBackspace)
       }
+      document.addEventListener('keydown', this.removeItemOnBackspace)
     } else if (prevState.focus && !this.state.focus) {
       debug('dropdown blurred')
-      if (!this.isMouseDown) {
-        const { closeOnBlur } = this.props
-        debug('mouse is not down, closing')
-        if (closeOnBlur) this.close()
+      const { closeOnBlur } = this.props
+      if (!this.isMouseDown && closeOnBlur) {
+        debug('mouse is not down and closeOnBlur=true, closing')
+        this.close()
       }
       document.removeEventListener('keydown', this.openOnArrow)
       document.removeEventListener('keydown', this.openOnSpace)
@@ -445,8 +454,10 @@ export default class Dropdown extends Component {
       document.removeEventListener('keydown', this.closeOnEscape)
       document.removeEventListener('keydown', this.moveSelectionOnKeyDown)
       document.removeEventListener('keydown', this.selectItemOnEnter)
-      document.removeEventListener('keydown', this.removeItemOnBackspace)
       document.removeEventListener('click', this.closeOnDocumentClick)
+      if (!this.state.focus) {
+        document.removeEventListener('keydown', this.removeItemOnBackspace)
+      }
     }
   }
 
@@ -476,6 +487,15 @@ export default class Dropdown extends Component {
     debug(value)
     const { onChange } = this.props
     if (onChange) onChange(e, { ...this.props, value })
+  }
+
+  closeOnChange = (e) => {
+    const { closeOnChange, multiple } = this.props
+    const shouldClose = _.isUndefined(closeOnChange)
+      ? !multiple
+      : closeOnChange
+
+    if (shouldClose) this.close(e)
   }
 
   closeOnEscape = (e) => {
@@ -524,7 +544,7 @@ export default class Dropdown extends Component {
     this.open(e)
   }
 
-  selectHighlightedItem = (e) => {
+  makeSelectedItemActive = (e) => {
     const { open } = this.state
     const { multiple, onAddItem } = this.props
     const item = this.getSelectedItem()
@@ -547,7 +567,6 @@ export default class Dropdown extends Component {
     } else {
       this.setValue(value)
       this.handleChange(e, value)
-      this.close()
     }
   }
 
@@ -557,7 +576,8 @@ export default class Dropdown extends Component {
     if (keyboardKey.getCode(e) !== keyboardKey.Enter) return
     e.preventDefault()
 
-    this.selectHighlightedItem(e)
+    this.makeSelectedItemActive(e)
+    this.closeOnChange(e)
   }
 
   removeItemOnBackspace = (e) => {
@@ -648,24 +668,29 @@ export default class Dropdown extends Component {
     } else {
       this.setValue(value)
       this.handleChange(e, value)
-      this.close()
     }
+    this.closeOnChange(e)
   }
 
   handleFocus = (e) => {
     debug('handleFocus()')
     const { onFocus } = this.props
+    const { focus } = this.state
+    if (focus) return
     if (onFocus) onFocus(e, this.props)
     this.setState({ focus: true })
   }
 
   handleBlur = (e) => {
     debug('handleBlur()')
-    const { multiple, onBlur, selectOnBlur } = this.props
+    const { closeOnBlur, multiple, onBlur, selectOnBlur } = this.props
     // do not "blur" when the mouse is down inside of the Dropdown
     if (this.isMouseDown) return
     if (onBlur) onBlur(e, this.props)
-    if (selectOnBlur && !multiple) this.selectHighlightedItem(e)
+    if (selectOnBlur && !multiple) {
+      this.makeSelectedItemActive(e)
+      if (closeOnBlur) this.close()
+    }
     this.setState({ focus: false, searchQuery: '' })
   }
 
@@ -684,7 +709,7 @@ export default class Dropdown extends Component {
     if (search && newQuery && !open) this.open()
 
     this.setState({
-      selectedIndex: this.getEnabledIndices()[0],
+      selectedIndex: 0,
       searchQuery: newQuery,
     })
   }
@@ -805,6 +830,9 @@ export default class Dropdown extends Component {
       searchQuery: '',
     }
 
+    const { multiple, search } = this.props
+    if (multiple && search && this._search) this._search.focus()
+
     this.trySetState({ value }, newState)
     this.setSelectedIndex(value)
   }
@@ -902,9 +930,7 @@ export default class Dropdown extends Component {
 
   scrollSelectedItemIntoView = () => {
     debug('scrollSelectedItemIntoView()')
-    // Do not access document when server side rendering
-    if (!isBrowser) return
-    const menu = document.querySelector('.ui.dropdown.active.visible .menu.visible')
+    const menu = this._dropdown.querySelector('.menu.visible')
     const item = menu.querySelector('.item.selected')
     debug(`menu: ${menu}`)
     debug(`item: ${item}`)
@@ -940,14 +966,19 @@ export default class Dropdown extends Component {
 
   handleClose = () => {
     debug('handleClose()')
+    const hasSearchFocus = document.activeElement === this._search
+    const hasDropdownFocus = document.activeElement === this._dropdown
+    const hasFocus = hasSearchFocus || hasDropdownFocus
     // https://github.com/Semantic-Org/Semantic-UI-React/issues/627
     // Blur the Dropdown on close so it is blurred after selecting an item.
     // This is to prevent it from re-opening when switching tabs after selecting an item.
-    this._dropdown.blur()
+    if (!hasSearchFocus) {
+      this._dropdown.blur()
+    }
 
     // We need to keep the virtual model in sync with the browser focus change
     // https://github.com/Semantic-Org/Semantic-UI-React/issues/692
-    this.setState({ focus: false })
+    this.setState({ focus: hasFocus })
   }
 
   toggle = (e) => this.state.open ? this.close(e) : this.open(e)
@@ -1138,8 +1169,8 @@ export default class Dropdown extends Component {
       floating,
       icon,
       inline,
+      item,
       labeled,
-      // linkItem,
       multiple,
       pointing,
       search,
@@ -1172,8 +1203,7 @@ export default class Dropdown extends Component {
       // TODO: the icon class is only required when a dropdown is a button
       // useKeyOnly(icon, 'icon'),
       useKeyOnly(labeled, 'labeled'),
-      // TODO: linkItem is required only when Menu child, add dynamically
-      // useKeyOnly(linkItem, 'link item'),
+      useKeyOnly(item, 'item'),
       useKeyOnly(multiple, 'multiple'),
       useKeyOnly(search, 'search'),
       useKeyOnly(selection, 'selection'),

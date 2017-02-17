@@ -1,8 +1,10 @@
 {
   "name": "semantic-ui-react",
-  "version": "0.64.3",
+  "version": "0.65.0",
   "description": "The official Semantic-UI-React integration.",
+  "jsnext:main": "dist/es/index.js",
   "main": "dist/commonjs/index.js",
+  "module": "dist/es/index.js",
   "files": [
     "src",
     "dist",
@@ -10,9 +12,11 @@
   ],
   "scripts": {
     "docs": "gulp docs",
-    "build": "npm run build:commonjs && npm run build:umd && npm run build:docs",
+    "build": "npm run build:commonjs && npm run build:es && npm run build:umd && npm run build:docs",
     "prebuild:commonjs": "rimraf dist/commonjs",
     "build:commonjs": "babel src -d dist/commonjs && npm run tsd",
+    "prebuild:es": "rimraf dist/es",
+    "build:es": "cross-env BABEL_ENV=es babel src -d dist/es",
     "prebuild:docs": "npm run build:docs-toc",
     "build:dll": "gulp dll",
     "build:docs": "gulp build:docs",
@@ -24,7 +28,7 @@
     "lint": "cross-env NODE_ENV=production eslint .",
     "lint:fix": "npm run lint -- --fix",
     "lint:watch": "watch 'npm run lint --silent' docs gulp src test",
-    "prerelease": "npm run lint && npm test && cross-env NODE_ENV=production npm run build",
+    "prerelease": "npm run lint && npm run tsd:lint && npm test && cross-env NODE_ENV=production npm run build",
     "postrelease": "NODE_ENV=production npm run deploy:docs",
     "release:major": "npm run prerelease && ta-script npm/release.sh major && npm run prerelease",
     "release:minor": "npm run prerelease && ta-script npm/release.sh minor && npm run prerelease",
@@ -49,6 +53,7 @@
   },
   "homepage": "https://github.com/Semantic-Org/Semantic-UI-React#readme",
   "dependencies": {
+    "babel-runtime": "^6.22.0",
     "classnames": "^2.1.5",
     "debug": "^2.4.5",
     "lodash": "^4.17.2"
@@ -81,7 +86,7 @@
     "doctoc": "^1.2.0",
     "doctrine": "^2.0.0",
     "empty": "^0.10.1",
-    "enzyme": "^2.6.0",
+    "enzyme": "^2.7.1",
     "eslint-config-ta": "^5.2.0",
     "eslint-plugin-jsx-a11y": "^3.0.1",
     "express": "^4.13.4",

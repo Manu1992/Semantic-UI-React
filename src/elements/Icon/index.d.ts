@@ -3,7 +3,7 @@ import {SemanticCOLORS, SemanticROTATION} from '../..';
 
 type ICON_SIZES = 'mini' | 'tiny' | 'small' | 'large' | 'big' | 'huge' | 'massive';
 
-interface IconProps {
+export interface IconProps {
   [key: string]: any;
 
   /** An element type to render as (string or function). */
@@ -53,7 +53,7 @@ interface IconProps {
 }
 
 interface IconComponent extends React.StatelessComponent<IconProps> {
-  Content: typeof IconGroup;
+  Group: typeof IconGroup;
 }
 
 export const Icon: IconComponent;
