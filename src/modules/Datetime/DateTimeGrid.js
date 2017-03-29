@@ -20,8 +20,8 @@ const DateTimeGrid = props => {
       <Table unstackable basic='very' attached='bottom' size='small' compact='very' textAlign='center'>
         <Table.Header>
           <Table.Row>
-            {headers.map(header => (
-              <Table.HeaderCell key={header} colSpan={colSpan}>
+            {headers.map((header, i) => (
+              <Table.HeaderCell key={i} colSpan={colSpan}>
                 {header}
               </Table.HeaderCell>
             ))}

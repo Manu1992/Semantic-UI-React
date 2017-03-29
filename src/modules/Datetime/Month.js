@@ -1,6 +1,7 @@
 import _ from 'lodash/fp'
 import React, { Component, PropTypes } from 'react'
 import DayCell from './DayCell'
+import DateTimeGrid from './DateTimeGrid'
 import * as utils from '../../lib/dateUtils'
 
 import {
@@ -134,6 +135,7 @@ export default class Month extends Component {
       dayParams.onClick = (e) => {
         onClick(e, dayParams.day)
       }
+      dayParams.content = dayParams.day
       dayCellDate.setDate(dayParams.day)
       dayParams.date = dayCellDate
       if (selectionStart) {
@@ -164,7 +166,7 @@ export default class Month extends Component {
 
   getMonthDays() {
     const days = this.getDays()
-    const cells = []
+    let cells = []
     const weeks = _.range(0, 6)
     const oneWeek = _.range(0, 7)
     let key = 0
@@ -176,11 +178,7 @@ export default class Month extends Component {
       })
       // skip fully disabled weeks
       if (_.some(d => !d.disabled, weekDays)) {
-        cells.push(
-          <Table.Row key={key}>
-            {weekDays.map(day => <DayCell key={day.day} {...day} />)}
-          </Table.Row>
-        )
+        cells = cells.concat(weekDays)
       }
     })
     return cells
@@ -188,15 +186,14 @@ export default class Month extends Component {
 
   render() {
     // TODO factor out for DateTimeGrid
+    const headers = this.getDayLabels()
+    const days = this.getMonthDays() 
     return (
-      <Table unstackable basic='very' attached='bottom' size='small' compact='very' className='center aligned'>
-        <Table.Header>
-          {this.getDayHeaders()}
-        </Table.Header>
-        <Table.Body>
-          {this.getMonthDays()}
-        </Table.Body>
-      </Table>
+      <DateTimeGrid
+        headers={headers}
+        columns={7}
+        cells={days}
+      />
     )
   }
 }
