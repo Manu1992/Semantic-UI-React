@@ -11,14 +11,15 @@ export function getMomentDateHandler(settings={}) {
   class DateHandler {
     static settings = settings
     constructor(date) {
+      if (!date) {
+        date = moment.tz()
+      }
       if (date.tz && date.tz()) {
         this.timeZone = date.tz()
       } else {
         this.timeZone = settings.timeZone || null
       }
-      if (date) {
-       this.set(date)
-      }
+      this.set(date)
     }
 
      /**

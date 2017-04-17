@@ -187,22 +187,22 @@ export default class Calendar extends Component {
   setDay = (e, day) => {
     e.stopPropagation()
     const {value, mode} = this.state
+    const { onDateSelect, time, range } = this.props
     const date = new this.Date(value)
     date.day(day)
-    debugger
-    const { onDateSelect, time } = this.props
+    const selectedDate = date.getDate()
     const nextMode = time ? 'hour' : mode
     const rangeState = {}
-    if (this.props.range) {
+    if (range) {
       rangeState.selectionStart = date
     }
     this.trySetState({
-      value: date.getDate(),
+      value: selectedDate,
       mode: nextMode,
       ...rangeState,
     })
     if (!time && onDateSelect) {
-      onDateSelect(e, date.getDate())
+      onDateSelect(e, selectedDate)
     }
   }
 
@@ -279,11 +279,12 @@ export default class Calendar extends Component {
   render() {
     const { date } = this.props
     const { mode, value } = this.state
+    const calendarDay = this.getDate()
     return (
       <div style={style}>
         {date && (
           <CalendarMenu
-            value={this.getDate()}
+            value={calendarDay}
             monthName={this.getMonthName()}
             year={this.getYear()}
             mode={mode}
