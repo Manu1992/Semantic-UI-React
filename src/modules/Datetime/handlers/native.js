@@ -99,11 +99,19 @@ export function getNativeDateHandler(settings={}) {
       return new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate()
     }
 
+    /**
+     * Returns a YYYYMMDD string representation of this date.
+     * Used to create date signatures to determine disabled dates in a
+     * calendar month
+     */
     getDateString(date) {
       date = date || this.date
       return `${date.getFullYear()}${date.getMonth()}${date.getDate()}`
     }
 
+    /**
+     * Returns a list of YYYYMMMDD date signatures for a list of dates
+     */
     getDateStrings(dates) {
       if (dates && dates.length) {
         return dates.map(date => this.getDateString(date))

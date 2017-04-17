@@ -85,6 +85,11 @@ export function getMomentDateHandler(settings={}) {
        }
      }
 
+     /**
+      * Returns a date of the first of the current month.
+      * A new instance is created as moment mutates the date
+      * when calling manipulation methods.
+      */
      getFirstOfMonth(date) {
        date = date || this.date
        const newDate = moment.tz(date, date.tz())
@@ -96,22 +101,38 @@ export function getMomentDateHandler(settings={}) {
        return date.day()
      }
 
+     /**
+      * Returns the number of days in the month
+      */
      daysInMonth(date) {
        date = date || this.date
        return date.daysInMonth()
      }
 
+     /**
+      * Create a new date, one month ago from current date.
+      * A new instance is created as moment mutates the date
+      * when calling manipulation methods.
+      */
      lastMonth(date) {
        date = date || this.date
        const newDate = moment.tz(date, date.tz())
        return newDate.subtract(1, 'months')
      }
 
+     /**
+      * Returns a YYYYMMDD string representation of this date.
+      * Used to create date signatures to determine disabled dates in a
+      * calendar month
+      */
      getDateString(date) {
        date = date || this.date
        return date.format('YYYYMMDD')
      }
 
+     /**
+      * Returns a list of YYYYMMMDD date signatures for a list of dates
+      */
      getDateStrings(dates) {
        if (dates && dates.length) {
          return dates.map(date => this.getDateString(date))

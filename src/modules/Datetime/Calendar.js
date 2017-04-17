@@ -196,6 +196,8 @@ export default class Calendar extends Component {
     if (range) {
       rangeState.selectionStart = date
     }
+    // TODO: WHen using native date, trySetState seems to not work
+    // well (value is not set), while setState does. 
     this.trySetState({
       value: selectedDate,
       mode: nextMode,
