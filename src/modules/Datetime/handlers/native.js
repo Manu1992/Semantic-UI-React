@@ -12,9 +12,7 @@ export function getNativeDateHandler(settings={}) {
   class DateHandler {
     static settings = settings
     constructor(date) {
-      if (date) {
-        this.set(date)
-      }
+      this.set(date)
     }
 
     /**
@@ -28,7 +26,11 @@ export function getNativeDateHandler(settings={}) {
      * re/set a new date on this instance
      */
     set(date) {
-      this.date = new Date(date)
+      if (typeof(date) == 'string' && date.trim().length == 0) {
+        this.date = new Date()
+      } else {
+        this.date = new Date(date)
+      }
       return this
     }
 
@@ -166,7 +168,7 @@ export function getNativeDateHandler(settings={}) {
     }
 
     /**
-     * Get or set the date of the date
+     * Get or set the calendar date of the date
      */
     day(value) {
       if (value) {

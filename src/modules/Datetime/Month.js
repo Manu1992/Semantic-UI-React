@@ -92,8 +92,8 @@ export default class Month extends Component {
   getDays() {
     const { date, onClick, disabledDates } = this.props
     const { selectionStart, selectionEnd } = this.state
+    console.log('disabltd', disabledDates)
     const _date = new this.Date(date)
-
     const firstDay = _date.getFirstOfMonth()
     const firstWeekDay = _date.getWeekDay(firstDay)
     const daysInMonth = _date.daysInMonth()
@@ -144,7 +144,7 @@ export default class Month extends Component {
       dayParams.selected = this.isCellSelected(dayCellDate, selectionStart, selectionEnd)
 
       if (hasDisabledDates && !dayParams.disabled &&
-        disabledDateSig.indexOf(this.getDateString(dayParams.date)) > -1) {
+        disabledDateSig.indexOf(_date.getDateString(dayCellDate.getDate())) > -1) {
         dayParams.disabled = true
       }
       return dayParams
