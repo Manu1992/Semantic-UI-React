@@ -35,6 +35,7 @@ export default class Month extends Component {
 
     /** Dates at or after selectionStart are marked as selected. */
     selectionStart: customPropTypes.DateValue,
+    dateHandler: PropTypes.any
   }
 
   static _meta = {
@@ -49,6 +50,8 @@ export default class Month extends Component {
 
   constructor(props) {
     super(props)
+    const {dateHandler} = props
+    this.Date = dateHandler
     this.state = {
       selectionStart: props.selectionStart,
       selectionEnd: props.selectionEnd,
@@ -81,14 +84,6 @@ export default class Month extends Component {
     return labels.map((day, index) => <Table.HeaderCell key={index}>{day}</Table.HeaderCell>)
   }
 
-  getDateString(date) {
-    return `${date.getFullYear()}${date.getMonth()}${date.getDate()}`
-  }
-
-  getDateStrings(dates) {
-    return dates.map(date => this.getDateString(date))
-  }
-
   /**
    * Return a 42 element array (number of cells in the calendar month),
    * populated with DayCell instances of either days of the current month,
@@ -97,14 +92,16 @@ export default class Month extends Component {
   getDays() {
     const { date, onClick, disabledDates } = this.props
     const { selectionStart, selectionEnd } = this.state
-    const firstDay = utils.getFirstOfMonth(date)
-    const firstWeekDay = firstDay.getDay()
-    const daysInMonth = utils.daysInMonth(date)
-    const lastMonth = utils.lastMonth(date)
-    const prevDaysInMonth = utils.daysInMonth(lastMonth)
+    const _date = new this.Date(date)
+
+    const firstDay = _date.getFirstOfMonth()
+    const firstWeekDay = _date.getWeekDay(firstDay)
+    const daysInMonth = _date.daysInMonth()
+    const lastMonth = new this.Date(_date.lastMonth())
+    const prevDaysInMonth = lastMonth.daysInMonth()
     // get a list of disabled date signatures
     const hasDisabledDates = disabledDates.length > 0
-    const disabledDateSig = this.getDateStrings(disabledDates)
+    const disabledDateSig = _date.getDateStrings(disabledDates)
     // 42 days in a calendar block will be enough to wrap a full month
     const monthCells = _.range(0, 42)
     // The real first day in relation to the sequene of calendar days (array index)
@@ -116,25 +113,26 @@ export default class Month extends Component {
     let day = 0
     let nextDay = 0
     return monthCells.map((cell, index) => {
-      const dayCellDate = new Date(firstDay)
+      const dayCellDate = new this.Date(firstDay)
       const dayParams = {
-        index: cell,
+        index: cell
       }
+      //debugger
       if (cell >= realFirstWeekDay && day < daysInMonth) {
         dayParams.day = day += 1
       } else if (cell < realFirstWeekDay) {
         dayParams.day = prevDaysInMonth - realFirstWeekDay + cell + 1
         dayParams.disabled = true
-        dayCellDate.setMonth(lastMonth.getMonth())
+        dayCellDate.month(lastMonth.month())
       } else if (cell > daysInMonth) {
         dayParams.day = nextDay += 1
         dayParams.disabled = true
-        dayCellDate.setMonth(dayCellDate.getMonth() + 1)
+        dayCellDate.month(dayCellDate.month() + 1)
       }
       dayParams.onClick = (e) => {
         onClick(e, dayParams.day)
       }
-      dayCellDate.setDate(dayParams.day)
+      dayCellDate.day(dayParams.day)
       dayParams.date = dayCellDate
       if (selectionStart) {
         dayParams.onMouseOver = () => {

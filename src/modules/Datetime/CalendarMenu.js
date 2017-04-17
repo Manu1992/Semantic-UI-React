@@ -24,9 +24,8 @@ export default class CalendarMenu extends Component {
     /** Year **/
     year: PropTypes.number,
 
-    // TODO consider using `value` instead
-    /** Current date **/
-    date: PropTypes.any,
+    /** Current day of the month **/
+    value: PropTypes.number,
 
     /** Current calendar mode **/
     mode: PropTypes.oneOf(['minute', 'hour', 'day', 'month', 'year']),
@@ -42,7 +41,7 @@ export default class CalendarMenu extends Component {
     onPrevious: PropTypes.func,
 
     /** Called when paginating to the next month. */
-    onNext: PropTypes.func,
+    onNext: PropTypes.func
   }
 
   static _meta = {
@@ -50,10 +49,10 @@ export default class CalendarMenu extends Component {
     parent: 'Datetime',
     type: META.TYPES.MODULE,
   }
-
+ 
   render() {
     const {
-      date,
+      value,
       mode,
       monthName,
       onChangeMode,
@@ -75,7 +74,7 @@ export default class CalendarMenu extends Component {
       ),
       _.includes(mode, ['hour', 'minute']) && (
         <Menu.Item key='hour-minute' onClick={onChangeMode.bind(null, 'month')}>
-          {monthName}&nbsp;{date.getDate()}
+          {monthName}&nbsp;{value}
         </Menu.Item>
       ),
       _.includes(mode, ['day', 'month', 'hour', 'minute']) && (
