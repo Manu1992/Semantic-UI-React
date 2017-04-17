@@ -12,6 +12,11 @@ const DatetimeTypesExamples = () => (
       examplePath='modules/Datetime/Types/DateTimeExampleFull'
     />
     <ComponentExample
+      title='Date and Time using Moment-Timezone dates'
+      description=''
+      examplePath='modules/Datetime/Types/DateTimeExampleMoment'
+    />
+    <ComponentExample
       title='Date'
       description='A date only Date selector'
       examplePath='modules/Datetime/Types/DateTimeExampleDateOnly'

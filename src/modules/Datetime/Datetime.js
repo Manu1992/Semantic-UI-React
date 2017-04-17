@@ -7,11 +7,12 @@ import {
   META,
 } from '../../lib'
 
-import { defaultDateFormatter, defaultTimeFormatter } from '../../lib/dateUtils'
+//import { defaultDateFormatter, defaultTimeFormatter } from '../../lib/dateUtils'
 import Calendar from './Calendar'
 import DateRange from './DateRange'
 import Input from '../../elements/Input/Input'
 import Popup from '../Popup/Popup'
+import {getDateHandlerClass} from './handlers'
 
 const debug = makeDebugger('datetime')
 
@@ -149,6 +150,9 @@ export default class Datetime extends Component {
 
     /** Current value as a Date object or a string that can be parsed into one. */
     value: customPropTypes.DateValue,
+    /** Placeholder text. */
+    dateHandler: PropTypes.string,
+    timeZone: PropTypes.string
   }
 
   static autoControlledProps = [
@@ -158,6 +162,7 @@ export default class Datetime extends Component {
 
   static defaultProps = {
     icon: 'calendar',
+    dateHandler: 'native',
     content: {
       daysShort: ['S', 'M', 'T', 'W', 'T', 'F', 'S'],
       daysFull: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
@@ -182,11 +187,28 @@ export default class Datetime extends Component {
       pm: 'PM',
     },
     disabledDates: [],
-    dateFormatter: defaultDateFormatter,
-    timeFormatter: defaultTimeFormatter,
+    dateFormatter: null, //defaultDateFormatter,
+    timeFormatter: null,  //defaultTimeFormatter,
     date: true,
     time: true,
   }
+
+  constructor(props) {
+    super(props)
+    const {
+      dateHandler,
+      dateFormatter,
+      timeFormatter,
+      timeZone
+    } = this.props
+    // set Date as the date handler for this instance
+    this.Date = getDateHandlerClass(dateHandler, {
+      dateFormatter,
+      timeFormatter,
+      timeZone
+    })
+  }
+
 
   open = (e) => {
     debug('open()')
@@ -226,9 +248,10 @@ export default class Datetime extends Component {
 
   handleDateSelection = (e, date) => {
     debug('handleDateSelection()', date, e)
+    const _date = new this.Date(date)
     e.stopPropagation()
     e.nativeEvent.stopImmediatePropagation()
-    const selectedDate = new Date(date)
+    const selectedDate = _date.getDate()
     this.trySetState({
       value: selectedDate,
     })
@@ -241,14 +264,14 @@ export default class Datetime extends Component {
   getFormattedDate(value) {
     value = value || this.state.value
     const { date, time, dateFormatter, timeFormatter } = this.props
-
+    const _date = new this.Date(value)
     if (date && time) {
-      return `${dateFormatter(value)} ${timeFormatter(value)}`
+      return _date.format()
     } else if (!date && time) {
-      return timeFormatter(value)
+      return _date.formatTime(value)
+    } else {
+      return _date.formatDate(value)
     }
-
-    return dateFormatter(value)
   }
 
   render() {
@@ -281,7 +304,6 @@ export default class Datetime extends Component {
         value={this.getFormattedDate(value)}
       />
     )
-
     return (
       <Popup
         on='click'
@@ -299,6 +321,7 @@ export default class Datetime extends Component {
       >
         <Calendar
           content={content}
+          dateHandler={this.Date}
           onDateSelect={this.handleDateSelection}
           timeFormatter={timeFormatter}
           firstDayOfWeek={firstDayOfWeek}
@@ -306,6 +329,7 @@ export default class Datetime extends Component {
           date={date}
           minDate={minDate}
           disabledDates={disabledDates}
+          value={value}
         />
       </Popup>
     )

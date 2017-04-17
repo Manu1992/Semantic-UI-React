@@ -343,7 +343,7 @@ export const DateValue = (props, propName, componentName) => {
       return new Date(value) != 'Invalid Date' && !isNaN(new Date(value)) ? null :
         new Error(propName + ' in ' + componentName + ' cannot be parsed as a date')
     } else if (typeof value === 'object') {
-      return value.getDate != undefined ? null :
+      return value.getDate != undefined || value._isAMomentObject != undefined ? null :
         new Error(propName + ' in ' + componentName + ' is not a Date or a string parsable date')
     }
   }
