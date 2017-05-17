@@ -152,12 +152,15 @@ export default class Datetime extends Component {
     value: customPropTypes.DateValue,
     /** Placeholder text. */
     dateHandler: PropTypes.string,
-    timeZone: PropTypes.string
+    timeZone: PropTypes.string,
+    defaultMode: PropTypes.string,
+    mode: PropTypes.string
   }
 
   static autoControlledProps = [
     'open',
     'value',
+    'mode'
   ]
 
   static defaultProps = {
@@ -207,8 +210,16 @@ export default class Datetime extends Component {
       timeFormatter,
       timeZone
     })
+    this.state = {
+      mode: this.getInitialMode()
+    }
+    console.log("INITIAL STATE", this.state)
   }
 
+  getInitialMode() {
+    const { date, time } = this.props
+    return !date && time ? 'hour' : 'day'
+  }
 
   open = (e) => {
     debug('open()')
@@ -225,7 +236,10 @@ export default class Datetime extends Component {
     const { onClose } = this.props
     if (onClose) onClose(e, this.props)
 
-    this.trySetState({ open: false })
+    this.trySetState({
+      open: false,
+      mode: this.getInitialMode()
+    })
   }
 
   toggle = (e) => this.state.open ? this.close(e) : this.open(e)
@@ -246,16 +260,29 @@ export default class Datetime extends Component {
     this.close(e)
   }
 
-  handleDateSelection = (e, date) => {
+  handleDateSelection = (e, date, nextMode, rangeStart) => {
     debug('handleDateSelection()', date, e)
-    const _date = new this.Date(date)
+    console.log('handleDateSelection', date, nextMode, rangeStart)
+    //const _date = new this.Date(date)
     e.stopPropagation()
     e.nativeEvent.stopImmediatePropagation()
-    const selectedDate = _date.getDate()
+    //const selectedDate = _date.getDate()
     this.trySetState({
-      value: selectedDate,
+      value: date,
+      mode: nextMode
     })
-    this.close()
+    if (!nextMode) {
+      this.close()
+    }
+  }
+
+  onSetMonth = (value, nextMode) => {
+    debug('onSetMonth()', value, nextMode)
+    console.log('onSetMonth', value, nextMode)
+    this.trySetState({
+      value: value,
+      mode: nextMode
+    })
   }
 
   /**
@@ -290,8 +317,8 @@ export default class Datetime extends Component {
       minDate,
       disabledDates,
     } = this.props
-    const { open, value } = this.state
-
+    const { open, value, mode } = this.state
+    console.log("INITIAL STATE", this.state)
     const inputElement = (
       <Input
         type='text'
@@ -320,9 +347,11 @@ export default class Datetime extends Component {
         closeOnDocumentClick={false}
       >
         <Calendar
+          mode={mode}
           content={content}
           dateHandler={this.Date}
           onDateSelect={this.handleDateSelection}
+          onChangeMonth={this.onSetMonth}
           timeFormatter={timeFormatter}
           firstDayOfWeek={firstDayOfWeek}
           time={time}
