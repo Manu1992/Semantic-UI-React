@@ -188,7 +188,9 @@ export default class Month extends Component {
     return (
       <Table unstackable basic='very' attached='bottom' size='small' compact='very' className='center aligned'>
         <Table.Header>
-          {this.getDayHeaders()}
+          <Table.Row>
+            {this.getDayHeaders()}
+          </Table.Row>
         </Table.Header>
         <Table.Body>
           {this.getMonthDays()}
