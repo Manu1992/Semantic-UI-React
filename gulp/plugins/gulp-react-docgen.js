@@ -1,4 +1,4 @@
-const gutil = require('gulp-util')
+const { log, colors, PluginError } = require('gulp-util')
 const _ = require('lodash')
 const path = require('path')
 const docgen = require('react-docgen')
@@ -12,8 +12,10 @@ module.exports = (filename) => {
   const pluginName = 'gulp-react-docgen'
   let finalFile
   let latestFile
+  const failures = []
 
-  function bufferContents(file, enc, cb) {
+  function transform(file, enc, cb) {
+    const relFilePath = path.relative(process.cwd(), file.path)
     latestFile = file
 
     if (file.isNull()) {
@@ -22,7 +24,7 @@ module.exports = (filename) => {
     }
 
     if (file.isStream()) {
-      cb(new gutil.PluginError(pluginName, 'Streaming is not supported'))
+      cb(new PluginError(pluginName, 'Streaming is not supported'))
       return
     }
 
@@ -43,22 +45,27 @@ module.exports = (filename) => {
       })
 
       result[relativePath] = parsed
-
-      cb()
     } catch (err) {
-      const pluginError = new gutil.PluginError(pluginName, err)
-      pluginError.message += `\nFile: ${file.path}.`
-      this.emit('error', pluginError)
+      failures.push(relFilePath)
+      log(`${colors.red('Failed')} to generate doc info for ${colors.cyan(relFilePath)}`)
+      log(colors.gray(err.stack))
     }
+
+    cb()
   }
 
-  function endStream(cb) {
+  function flush(cb) {
     finalFile = latestFile.clone({ contents: false })
     finalFile.path = path.join(latestFile.base, (filename || defaultFilename))
     finalFile.contents = new Buffer(JSON.stringify(result, null, 2))
     this.push(finalFile)
+
+    if (failures.length) {
+      cb(new PluginError(pluginName, 'Could not generate doc info for:' + failures.map(f => `\n  ${f}`).join('')))
+      return
+    }
     cb()
   }
 
-  return through.obj(bufferContents, endStream)
+  return through.obj(transform, flush)
 }

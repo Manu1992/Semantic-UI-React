@@ -28,13 +28,10 @@ const parseUnion = union => {
   return Object.assign(union, { value: transformed })
 }
 
-const parsers = {
-  enum: parseEnum,
-  union: parseUnion,
-}
-
 module.exports = ({ type }) => {
-  const parser = parsers[type.name]
+  if (!type) return null
+  if (type.name === 'enum') return parseEnum(type)
+  if (type.name === 'union') return parseUnion(type)
 
-  return parser ? parser(type) : type
+  return type
 }
