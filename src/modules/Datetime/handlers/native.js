@@ -8,9 +8,10 @@
  * and therefore is less suitable to support dates from varying time zones.
  */
 
-export function getNativeDateHandler(settings={}) {
+export function getNativeDateHandler(settings = {}) {
   class DateHandler {
     static settings = settings
+
     constructor(date) {
       this.set(date)
     }
@@ -26,7 +27,7 @@ export function getNativeDateHandler(settings={}) {
      * re/set a new date on this instance
      */
     set(date) {
-      if (typeof(date) == 'string' && date.trim().length == 0) {
+      if (typeof(date) === 'string' && date.trim().length === 0) {
         this.date = new Date()
       } else {
         this.date = new Date(date)
@@ -46,42 +47,37 @@ export function getNativeDateHandler(settings={}) {
     /**
      * Returns a string formatted date/time value
      */
-    format(formatString) {
-      if (this.date) {
-        return `${this.formatDate()} ${this.formatTime()}`
-      } else {
-        return ''
-      }
+    format() {
+      return this.date ? `${this.formatDate()} ${this.formatTime()}` : ''
     }
 
-    /**
-     * Returns a date formatted string
-     */
-    formatDate(formatString) {
-      if (this.date && this.date != 'Invalid Date') {
-        const settings = this.getSettings()
-        if (settings.dateFormatter) {
-          return settings.dateFormatter(this.date)
+    /** Returns a date formatted string */
+    formatDate() {
+      if (this.date && this.date !== 'Invalid Date') {
+        const _settings = this.getSettings()
+        if (_settings.dateFormatter) {
+          return _settings.dateFormatter(this.date)
         }
-        return `${this.date.getFullYear()}-${this.zeroPad(this.date.getMonth() + 1)}-${this.zeroPad(this.date.getDate())}`
-      } else {
-        return ''
+        return [
+          this.date.getFullYear(),
+          this.zeroPad(this.date.getMonth() + 1),
+          this.zeroPad(this.date.getDate()),
+        ].join('-')
       }
+
+      return ''
     }
 
-    /**
-     * Return a time formatted string
-     */
+    /** Return a time formatted string */
     formatTime(formatString) {
       if (this.date) {
-        const settings = this.getSettings()
-        if (settings.timeFormatter) {
-          return settings.timeFormatter(this.date)
+        const _settings = this.getSettings()
+        if (_settings.timeFormatter) {
+          return _settings.timeFormatter(this.date)
         }
         return `${this.zeroPad(this.date.getHours())}:${this.zeroPad(this.date.getMinutes())}`
-      } else {
-        return ''
       }
+      return ''
     }
 
     getFirstOfMonth(date) {
@@ -128,7 +124,6 @@ export function getNativeDateHandler(settings={}) {
       _date.setMonth(date.getMonth() - 1)
       return _date
     }
-
 
     /**
      * Returns yesterday's date
@@ -192,7 +187,7 @@ export function getNativeDateHandler(settings={}) {
       if (value) {
         this.date.setHours(value)
       }
-      console.log("NATIVE", this.date, this.date.getHours())
+      console.log('NATIVE', this.date, this.date.getHours())
       return this.date.getHours()
     }
 

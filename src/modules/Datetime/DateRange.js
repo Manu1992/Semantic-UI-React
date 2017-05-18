@@ -1,4 +1,5 @@
-import React, { PropTypes } from 'react'
+import PropTypes from 'prop-types'
+import React from 'react'
 
 import {
   AutoControlledComponent as Component,
@@ -7,12 +8,12 @@ import {
   META,
 } from '../../lib'
 
-//import { defaultDateFormatter, defaultTimeFormatter } from '../../lib/dateUtils'
+// import { defaultDateFormatter, defaultTimeFormatter } from '../../lib/dateUtils'
 import Calendar from './Calendar'
 import Input from '../../elements/Input'
 import Popup from '../Popup'
 import Grid from '../../collections/Grid'
-import {getDateHandlerClass} from './handlers'
+import { getDateHandlerClass } from './handlers'
 
 const debug = makeDebugger('datetime')
 
@@ -69,6 +70,8 @@ export default class DateRange extends Component {
      * @type {function}
      */
     dateFormatter: PropTypes.func,
+
+    dateHandler: PropTypes.function,
 
     /** A disabled dropdown menu or item does not allow user interaction. */
     disabled: PropTypes.bool,
@@ -152,6 +155,8 @@ export default class DateRange extends Component {
     /** Enables time selection. */
     time: PropTypes.bool,
 
+    timeZone: PropTypes.string,
+
     /**
      * A function that will return the time image of a Date object as a formatted
      * string in the current locale. By default the time will be formatted as HH:MM.
@@ -170,7 +175,7 @@ export default class DateRange extends Component {
     'rangeFocus',
     'selectionStart',
     'selectionEnd',
-    'mode'
+    'mode',
   ]
 
   static defaultProps = {
@@ -200,8 +205,8 @@ export default class DateRange extends Component {
       pm: 'PM',
     },
     disabledDates: [],
-    dateFormatter: null, //defaultDateFormatter,
-    timeFormatter: null,  //defaultTimeFormatter,
+    dateFormatter: null, // defaultDateFormatter,
+    timeFormatter: null,  // defaultTimeFormatter,
     date: true,
     time: false,
   }
@@ -212,16 +217,16 @@ export default class DateRange extends Component {
       dateHandler,
       dateFormatter,
       timeFormatter,
-      timeZone
+      timeZone,
     } = this.props
     // set Date as the date handler for this instance
     this.Date = getDateHandlerClass(dateHandler, {
       dateFormatter,
       timeFormatter,
-      timeZone
+      timeZone,
     })
     this.state = {
-      mode: this.getInitialMode()
+      mode: this.getInitialMode(),
     }
   }
 
@@ -250,7 +255,7 @@ export default class DateRange extends Component {
 
     this.trySetState({
       open: false,
-      mode: this.getInitialMode()
+      mode: this.getInitialMode(),
     })
   }
 
@@ -315,18 +320,17 @@ export default class DateRange extends Component {
   /**
    * Return a formatted date or date/time string
    */
-   getFormattedDate(value) {
-     value = value || this.state.value
-     const { date, time, dateFormatter, timeFormatter } = this.props
-     const _date = new this.Date(value)
-     if (date && time) {
-       return _date.format()
-     } else if (!date && time) {
-       return _date.formatTime(value)
-     } else {
-       return _date.formatDate(value)
-     }
-   }
+  getFormattedDate(value) {
+    value = value || this.state.value
+    const { date, time } = this.props
+    const _date = new this.Date(value)
+    if (date && time) {
+      return _date.format()
+    } else if (!date && time) {
+      return _date.formatTime(value)
+    }
+    return _date.formatDate(value)
+  }
 
   /**
    * Get a 2 element array to determine the left and right
@@ -378,7 +382,6 @@ export default class DateRange extends Component {
     const {
       open,
       value,
-      mode,
       selectionStart,
       selectionEnd,
     } = this.state

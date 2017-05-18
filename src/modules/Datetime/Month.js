@@ -1,7 +1,7 @@
 import _ from 'lodash/fp'
-import React, { Component, PropTypes } from 'react'
+import PropTypes from 'prop-types'
+import React, { Component } from 'react'
 import DayCell from './DayCell'
-import * as utils from '../../lib/dateUtils'
 
 import {
   customPropTypes,
@@ -35,7 +35,7 @@ export default class Month extends Component {
 
     /** Dates at or after selectionStart are marked as selected. */
     selectionStart: customPropTypes.DateValue,
-    dateHandler: PropTypes.any
+    dateHandler: PropTypes.any,
   }
 
   static _meta = {
@@ -50,7 +50,7 @@ export default class Month extends Component {
 
   constructor(props) {
     super(props)
-    const {dateHandler} = props
+    const { dateHandler } = props
     this.Date = dateHandler
     this.state = {
       selectionStart: props.selectionStart,
@@ -92,7 +92,6 @@ export default class Month extends Component {
   getDays() {
     const { date, onClick, disabledDates } = this.props
     const { selectionStart, selectionEnd } = this.state
-    console.log('disabltd', disabledDates)
     const _date = new this.Date(date)
     const firstDay = _date.getFirstOfMonth()
     const firstWeekDay = _date.getWeekDay(firstDay)
@@ -115,9 +114,9 @@ export default class Month extends Component {
     return monthCells.map((cell, index) => {
       const dayCellDate = new this.Date(firstDay)
       const dayParams = {
-        index: cell
+        index: cell,
       }
-      //debugger
+      // debugger
       if (cell >= realFirstWeekDay && day < daysInMonth) {
         dayParams.day = day += 1
       } else if (cell < realFirstWeekDay) {
@@ -156,8 +155,8 @@ export default class Month extends Component {
    */
   isCellSelected(date, selectionStart, selectionEnd) {
     return selectionStart && selectionStart <= date
-           && selectionEnd && selectionEnd >= date
-           && selectionEnd > selectionStart;
+      && selectionEnd && selectionEnd >= date
+      && selectionEnd > selectionStart
   }
 
   getMonthDays() {

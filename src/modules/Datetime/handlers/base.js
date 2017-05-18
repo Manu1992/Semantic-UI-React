@@ -10,8 +10,8 @@ export default class BaseDateHandler {
    * It can also receive a custom date/time formatter functions and
    * an optional timezone where relevant.
    */
-  constructor(date, dateFormatter=null, timeFormatter=null, timeZone=null) {
-    this.date = date;
+  constructor(date, dateFormatter = null, timeFormatter = null, timeZone = null) {
+    this.date = date
     this._dateFormatter = dateFormatter
     this._timeFormatter = timeFormatter
   }

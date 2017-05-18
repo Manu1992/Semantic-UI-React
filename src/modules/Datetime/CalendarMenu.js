@@ -1,8 +1,8 @@
 import _ from 'lodash/fp'
-import React, { Component, PropTypes } from 'react'
+import PropTypes from 'prop-types'
+import React, { Component } from 'react'
 
 import {
-  customPropTypes,
   META,
 } from '../../lib'
 
@@ -41,7 +41,7 @@ export default class CalendarMenu extends Component {
     onPrevious: PropTypes.func,
 
     /** Called when paginating to the next month. */
-    onNext: PropTypes.func
+    onNext: PropTypes.func,
   }
 
   static _meta = {
@@ -49,7 +49,7 @@ export default class CalendarMenu extends Component {
     parent: 'Datetime',
     type: META.TYPES.MODULE,
   }
- 
+
   render() {
     const {
       value,

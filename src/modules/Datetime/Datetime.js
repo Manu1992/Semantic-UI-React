@@ -1,4 +1,5 @@
-import React, { PropTypes } from 'react'
+import PropTypes from 'prop-types'
+import React from 'react'
 
 import {
   AutoControlledComponent as Component,
@@ -7,12 +8,11 @@ import {
   META,
 } from '../../lib'
 
-//import { defaultDateFormatter, defaultTimeFormatter } from '../../lib/dateUtils'
 import Calendar from './Calendar'
 import DateRange from './DateRange'
 import Input from '../../elements/Input/Input'
 import Popup from '../Popup/Popup'
-import {getDateHandlerClass} from './handlers'
+import { getDateHandlerClass } from './handlers'
 
 const debug = makeDebugger('datetime')
 
@@ -154,13 +154,13 @@ export default class Datetime extends Component {
     dateHandler: PropTypes.string,
     timeZone: PropTypes.string,
     defaultMode: PropTypes.string,
-    mode: PropTypes.string
+    mode: PropTypes.string,
   }
 
   static autoControlledProps = [
     'open',
     'value',
-    'mode'
+    'mode',
   ]
 
   static defaultProps = {
@@ -190,8 +190,8 @@ export default class Datetime extends Component {
       pm: 'PM',
     },
     disabledDates: [],
-    dateFormatter: null, //defaultDateFormatter,
-    timeFormatter: null,  //defaultTimeFormatter,
+    dateFormatter: null, // defaultDateFormatter,
+    timeFormatter: null,  // defaultTimeFormatter,
     date: true,
     time: true,
   }
@@ -202,16 +202,16 @@ export default class Datetime extends Component {
       dateHandler,
       dateFormatter,
       timeFormatter,
-      timeZone
+      timeZone,
     } = this.props
     // set Date as the date handler for this instance
     this.Date = getDateHandlerClass(dateHandler, {
       dateFormatter,
       timeFormatter,
-      timeZone
+      timeZone,
     })
     this.state = {
-      mode: this.getInitialMode()
+      mode: this.getInitialMode(),
     }
   }
 
@@ -237,7 +237,7 @@ export default class Datetime extends Component {
 
     this.trySetState({
       open: false,
-      mode: this.getInitialMode()
+      mode: this.getInitialMode(),
     })
   }
 
@@ -262,13 +262,13 @@ export default class Datetime extends Component {
   handleDateSelection = (e, date, nextMode, rangeStart) => {
     debug('handleDateSelection()', date, e)
     console.log('handleDateSelection', date, nextMode, rangeStart)
-    //const _date = new this.Date(date)
+    // const _date = new this.Date(date)
     e.stopPropagation()
     e.nativeEvent.stopImmediatePropagation()
-    //const selectedDate = _date.getDate()
+    // const selectedDate = _date.getDate()
     this.trySetState({
       value: date,
-      mode: nextMode
+      mode: nextMode,
     })
     if (!nextMode) {
       this.close()
@@ -279,8 +279,8 @@ export default class Datetime extends Component {
     debug('onSetMonth()', value, nextMode)
     console.log('onSetMonth', value, nextMode)
     this.trySetState({
-      value: value,
-      mode: nextMode
+      value,
+      mode: nextMode,
     })
   }
 
@@ -289,15 +289,15 @@ export default class Datetime extends Component {
    */
   getFormattedDate(value) {
     value = value || this.state.value
-    const { date, time, dateFormatter, timeFormatter } = this.props
+    const { date, time } = this.props
     const _date = new this.Date(value)
     if (date && time) {
       return _date.format()
     } else if (!date && time) {
       return _date.formatTime(value)
-    } else {
-      return _date.formatDate(value)
     }
+
+    return _date.formatDate(value)
   }
 
   render() {
