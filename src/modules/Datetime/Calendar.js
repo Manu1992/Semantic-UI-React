@@ -174,19 +174,7 @@ export default class Calendar extends Component {
     const { onDateSelect, value } = this.props
     const date = new this.Date(value)
     date.minutes(minute)
-    //const extraState = {}
-    let nextMode = null
-    if (this.props.range) {
-      //extraState.mode = 'day'
-      nextMode = 'day'
-    }
-    // this.trySetState({
-    //   value: date.getDate(),
-    //   ...extraState,
-    // })
-    // if (onDateSelect) {
-    //   onDateSelect(e, date.getDate())
-    // }
+    const nextMode = this.props.range ? ' day' : null
     onDateSelect(e, date.getDate(), nextMode)
   }
 
@@ -198,21 +186,7 @@ export default class Calendar extends Component {
 
     const selectedDate = date.getDate()
     const nextMode = time ? 'hour' : null
-    // const rangeState = {}
-    // if (range) {
-    //   rangeState.selectionStart = date
-    // }
-    // TODO: WHen using native date, trySetState seems to not work
-    // well (value is not set), while setState does.
-    // this.trySetState({
-    //   value: selectedDate,
-    //   mode: nextMode,
-    //   ...rangeState,
-    // })
     onDateSelect(e, selectedDate, nextMode, range ? date : null)
-    if (!time && onDateSelect) {
-      //onDateSelect(e, selectedDate)
-    }
   }
 
   page = (direction, e) => {
@@ -246,7 +220,6 @@ export default class Calendar extends Component {
     e.stopPropagation()
     const {value, onDateSelect} = this.props
     onDateSelect(e, value, mode)
-    //this.trySetState({ mode })
   }
 
   /**
@@ -261,7 +234,6 @@ export default class Calendar extends Component {
       value,
       selectionStart,
       selectionEnd } = this.props
-    console.log("calendar getBodyContent()  > ", mode, value)
     switch (mode) {
       case 'day':
         return (

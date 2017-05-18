@@ -7,11 +7,12 @@ import {
   META,
 } from '../../lib'
 
-import { defaultDateFormatter, defaultTimeFormatter } from '../../lib/dateUtils'
+//import { defaultDateFormatter, defaultTimeFormatter } from '../../lib/dateUtils'
 import Calendar from './Calendar'
 import Input from '../../elements/Input'
 import Popup from '../Popup'
 import Grid from '../../collections/Grid'
+import {getDateHandlerClass} from './handlers'
 
 const debug = makeDebugger('datetime')
 
@@ -27,6 +28,9 @@ export default class DateRange extends Component {
   }
 
   static propTypes = {
+    /** An element type to render as (string or function). */
+    as: customPropTypes.as,
+
     /**
      * Textual content for the various text element of the calendar.
      * {
@@ -52,6 +56,7 @@ export default class DateRange extends Component {
      *   am: 'AM',
      *   pm: 'PM',
      * }
+     * @type {Object}
      */
     content: PropTypes.object,
 
@@ -60,16 +65,25 @@ export default class DateRange extends Component {
 
     /**
      * A function that will return a Date object as a formatted string in the
-     * current locale. By default the Date will formatted as YYYY-MM-DD.
+     * current locale. By default the Date will formatted as YYYY-MM-DD
+     * @type {function}
      */
-    // TODO add signature
     dateFormatter: PropTypes.func,
+
+    /** A disabled dropdown menu or item does not allow user interaction. */
+    disabled: PropTypes.bool,
+
+    /** An array of dates that should be marked disabled in the calendar. */
+    disabledDates: PropTypes.arrayOf(customPropTypes.DateValue),
 
     /** initial value for left and right months **/
     defaultMonths: PropTypes.arrayOf(PropTypes.number),
 
     /** Initial value of open. */
     defaultOpen: PropTypes.bool,
+
+    /** Initial value as an array of Date object or a string that can be parsed into one. */
+    defaultValue: PropTypes.arrayOf(customPropTypes.DateValue),
 
     /** Default value for rangeFocus. */
     defaultRangeFocus: PropTypes.number,
@@ -79,12 +93,6 @@ export default class DateRange extends Component {
 
     /** The initial value for selectionStart. */
     defaultSelectionStart: customPropTypes.DateValue,
-
-    /** Initial value as an array of Date object or a string that can be parsed into one. */
-    defaultValue: PropTypes.arrayOf(customPropTypes.DateValue),
-
-    /** A disabled dropdown menu or item does not allow user interaction. */
-    disabled: PropTypes.bool,
 
     /** An errored dropdown can alert a user to a problem. */
     error: PropTypes.bool,
@@ -97,9 +105,6 @@ export default class DateRange extends Component {
       PropTypes.node,
       PropTypes.object,
     ]),
-
-    /** An array of dates that should be marked disabled in the calendar. */
-    disabledDates: PropTypes.arrayOf(customPropTypes.DateValue),
 
     /** Do not allow dates after maxDate. */
     maxDate: customPropTypes.DateValue,
@@ -165,10 +170,12 @@ export default class DateRange extends Component {
     'rangeFocus',
     'selectionStart',
     'selectionEnd',
+    'mode'
   ]
 
   static defaultProps = {
     icon: 'calendar',
+    dateHandler: 'native',
     content: {
       daysShort: ['S', 'M', 'T', 'W', 'T', 'F', 'S'],
       daysFull: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
@@ -192,10 +199,35 @@ export default class DateRange extends Component {
       am: 'AM',
       pm: 'PM',
     },
-    dateFormatter: defaultDateFormatter,
-    timeFormatter: defaultTimeFormatter,
+    disabledDates: [],
+    dateFormatter: null, //defaultDateFormatter,
+    timeFormatter: null,  //defaultTimeFormatter,
     date: true,
     time: false,
+  }
+
+  constructor(props) {
+    super(props)
+    const {
+      dateHandler,
+      dateFormatter,
+      timeFormatter,
+      timeZone
+    } = this.props
+    // set Date as the date handler for this instance
+    this.Date = getDateHandlerClass(dateHandler, {
+      dateFormatter,
+      timeFormatter,
+      timeZone
+    })
+    this.state = {
+      mode: this.getInitialMode()
+    }
+  }
+
+  getInitialMode() {
+    const { date, time } = this.props
+    return !date && time ? 'hour' : 'day'
   }
 
   open = (e) => {
@@ -216,7 +248,10 @@ export default class DateRange extends Component {
     const { onClose } = this.props
     if (onClose) onClose(e, this.props)
 
-    this.trySetState({ open: false })
+    this.trySetState({
+      open: false,
+      mode: this.getInitialMode()
+    })
   }
 
   toggle = (e) => this.state.open ? this.close(e) : this.open(e)
@@ -280,23 +315,18 @@ export default class DateRange extends Component {
   /**
    * Return a formatted date or date/time string
    */
-  getFormattedDate(value = this.state.value) {
-    const formatted = []
-    if (!value) return ''
-
-    const { date, time, dateFormatter, timeFormatter } = this.props
-    value.forEach((item) => {
-      if (item) {
-        if (date && time) {
-          formatted.push(`${dateFormatter(item)} ${timeFormatter(item)}`)
-        } else if (!date && time) {
-          formatted.push(timeFormatter(item))
-        }
-        formatted.push(dateFormatter(item))
-      }
-    })
-    return formatted.join(' ')
-  }
+   getFormattedDate(value) {
+     value = value || this.state.value
+     const { date, time, dateFormatter, timeFormatter } = this.props
+     const _date = new this.Date(value)
+     if (date && time) {
+       return _date.format()
+     } else if (!date && time) {
+       return _date.formatTime(value)
+     } else {
+       return _date.formatDate(value)
+     }
+   }
 
   /**
    * Get a 2 element array to determine the left and right
@@ -348,6 +378,7 @@ export default class DateRange extends Component {
     const {
       open,
       value,
+      mode,
       selectionStart,
       selectionEnd,
     } = this.state
@@ -365,7 +396,6 @@ export default class DateRange extends Component {
         value={this.getFormattedDate(value)}
       />
     )
-
     return (
       <Popup
         flowing
@@ -386,6 +416,7 @@ export default class DateRange extends Component {
           <Grid.Column>
             <Calendar
               value={months[0]}
+              dateHandler={this.Date}
               content={this.props.content}
               onDateSelect={this.handleDateSelection.bind(this, 0)}
               onChangeMonth={this.handleMonthChange.bind(this, 0)}
@@ -403,6 +434,7 @@ export default class DateRange extends Component {
           <Grid.Column>
             <Calendar
               value={months[1]}
+              dateHandler={this.Date}
               content={this.props.content}
               onDateSelect={this.handleDateSelection.bind(this, 1)}
               onChangeMonth={this.handleMonthChange.bind(this, 1)}
