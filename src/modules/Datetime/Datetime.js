@@ -331,18 +331,23 @@ export default class Datetime extends Component {
     )
     return (
       <Popup
-        on='click'
+        openOnTriggerFocus
+        closeOnDocumentClick
+        // TODO: Fix close on trigger blur, it closes when clicking inside the calendar.
+        // Calendar contents are changed on click, so Popup cannot find the clicked node within calendar.
+        // If the clicked node is not within the Portal, it is considered a "blur" and closes.
+        // Enable close on trigger blur after this is fixed.
+        // Portal should be able to identify clicks within the portal even with no e.target, perhaps using x y coords.
+        closeOnTriggerBlur={false}
+        openOnTriggerMouseEnter={false}
+        closeOnTriggerMouseLeave={false}
+        openOnTriggerClick={false}
+        closeOnTriggerClick={false}
         trigger={inputElement}
         position='bottom left'
         open={open}
         onOpen={this.handleOpen}
         onClose={this.handleClose}
-        // TODO: Calendar contents are changed on click so the Popup cannot find the clicked node within calendar.
-        // The Popup then considers the click to be "outside" of the calendar and closes it.
-        // Enable close on document click after this is fixed.
-        // The user should be able to click outside and have it close.
-        // Portal should be updated to detect clicks inside/outside even with no e.target, perhaps using x y coords.
-        closeOnDocumentClick={false}
       >
         <Calendar
           mode={mode}
