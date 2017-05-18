@@ -1,4 +1,5 @@
-import React, { PropTypes, Component } from 'react'
+import PropTypes from 'prop-types'
+import React, { Component } from 'react'
 import CalendarMenu from './CalendarMenu'
 import Month from './Month'
 import Months from './Months'
@@ -7,7 +8,7 @@ import Hours from './Hours'
 import Minutes from './Minutes'
 
 import {
-  //AutoControlledComponent as Component,
+  // AutoControlledComponent as Component,
   customPropTypes,
   META,
 } from '../../lib'
@@ -83,7 +84,7 @@ export default class Calendar extends Component {
 
     /** Current value as a Date object or a string that can be parsed into one. */
     value: customPropTypes.DateValue,
-    dateHandler: PropTypes.func
+    dateHandler: PropTypes.func,
   }
 
   static defaultProps = {
@@ -94,7 +95,7 @@ export default class Calendar extends Component {
     range: false,
     mode: 'day',
     selectionStart: null,
-    selectionEnd: null
+    selectionEnd: null,
   }
 
   // static autoControlledProps = [
@@ -106,14 +107,13 @@ export default class Calendar extends Component {
 
   constructor(props) {
     super(props)
-    const {dateHandler} = props
+    const { dateHandler } = props
     this.Date = dateHandler
     // const initialValue = new this.Date(new Date()).getDate()
     // this.state = {
     //   value: initialValue,
     //   mode: this.getInitialMode(props),
     // }
-
   }
 
   // getInitialMode(props) {
@@ -132,7 +132,7 @@ export default class Calendar extends Component {
   }
 
   setMonth = (e, props) => {
-    console.log("Calendar setMonth()", props)
+    console.log('Calendar setMonth()', props)
     e.stopPropagation()
     const { value, page } = props
     const { onDateSelect } = this.props
@@ -155,7 +155,7 @@ export default class Calendar extends Component {
 
   setYear = (e, year, nextMode = 'day') => {
     e.stopPropagation()
-    const {value, onDateSelect} = this.props
+    const { value, onDateSelect } = this.props
     const date = new this.Date(value)
     date.year(year)
     onDateSelect(e, date.getDate(), nextMode)
@@ -163,7 +163,7 @@ export default class Calendar extends Component {
 
   setHour = (e, hour, nextMode = 'minute') => {
     e.stopPropagation()
-    const {value, onDateSelect} = this.props
+    const { value, onDateSelect } = this.props
     const date = new this.Date(value)
     date.hours(hour)
     onDateSelect(e, date.getDate(), nextMode)
@@ -180,7 +180,7 @@ export default class Calendar extends Component {
 
   setDay = (e, day) => {
     e.stopPropagation()
-    const { onDateSelect, time, range, value, mode } = this.props
+    const { onDateSelect, time, range, value } = this.props
     const date = new this.Date(value)
     date.day(day)
 
@@ -218,7 +218,7 @@ export default class Calendar extends Component {
    */
   changeMode = (mode, e) => {
     e.stopPropagation()
-    const {value, onDateSelect} = this.props
+    const { value, onDateSelect } = this.props
     onDateSelect(e, value, mode)
   }
 
@@ -233,7 +233,8 @@ export default class Calendar extends Component {
       mode,
       value,
       selectionStart,
-      selectionEnd } = this.props
+      selectionEnd,
+    } = this.props
     switch (mode) {
       case 'day':
         return (
@@ -267,7 +268,7 @@ export default class Calendar extends Component {
   }
 
   render() {
-    const { date, mode, value } = this.props
+    const { date, mode } = this.props
     const calendarDay = this.getDate()
     return (
       <div style={style}>

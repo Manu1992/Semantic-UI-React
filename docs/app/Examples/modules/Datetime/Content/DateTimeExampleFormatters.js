@@ -1,7 +1,7 @@
 import React from 'react'
 import { Datetime } from 'semantic-ui-react'
 
- // Return locale formatted date string
+// Return locale formatted date string
 const dateFormatter = (date) => !!date ? date.toLocaleDateString() : ''
 
 // Returns locale formatted time with the seconds removed
