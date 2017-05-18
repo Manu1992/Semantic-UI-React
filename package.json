@@ -111,6 +111,7 @@
     "karma-phantomjs-shim": "^1.4.0",
     "karma-webpack-with-fast-source-maps": "^1.9.2",
     "mocha": "^3.3.0",
+    "moment-timezone": "^0.5.13",
     "node-sass": "^4.1.1",
     "phantomjs-prebuilt": "^2.1.7",
     "raw-loader": "^0.5.1",
