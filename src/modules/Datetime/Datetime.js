@@ -213,7 +213,6 @@ export default class Datetime extends Component {
     this.state = {
       mode: this.getInitialMode()
     }
-    console.log("INITIAL STATE", this.state)
   }
 
   getInitialMode() {
@@ -318,7 +317,6 @@ export default class Datetime extends Component {
       disabledDates,
     } = this.props
     const { open, value, mode } = this.state
-    console.log("INITIAL STATE", this.state)
     const inputElement = (
       <Input
         type='text'
