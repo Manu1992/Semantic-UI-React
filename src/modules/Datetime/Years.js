@@ -43,7 +43,6 @@ export default class Years extends Component {
   render() {
     return (
       <DateTimeGrid
-        headers={['Year']}
         columns={3}
         cells={this.getYears()}
       />

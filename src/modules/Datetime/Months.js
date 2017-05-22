@@ -41,7 +41,6 @@ export default class Months extends Component {
   render() {
     return (
       <DateTimeGrid
-        headers={['Month']}
         columns={3}
         cells={this.getMonths()}
       />

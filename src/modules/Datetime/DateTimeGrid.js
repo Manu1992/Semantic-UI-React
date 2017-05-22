@@ -13,7 +13,7 @@ const cellStyle = { border: 'none' }
  * A DateTimeGrid displays a grid of options in a DateTime component.
  */
 const DateTimeGrid = props => {
-  const { headers, columns, cells } = props
+  const { headers = [], columns, cells } = props
   const colSpan = Math.round(columns / headers.length)
 
   return (
