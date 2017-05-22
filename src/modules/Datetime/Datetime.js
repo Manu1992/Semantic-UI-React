@@ -1,3 +1,4 @@
+import _ from 'lodash/fp'
 import PropTypes from 'prop-types'
 import React from 'react'
 
@@ -222,18 +223,14 @@ export default class Datetime extends Component {
 
   open = (e) => {
     debug('open()')
-
-    const { onOpen } = this.props
-    if (onOpen) onOpen(e, this.props)
+    _.invoke('onOpen', this.props, e, this.props)
 
     this.trySetState({ open: true })
   }
 
   close = (e) => {
     debug('close()')
-
-    const { onClose } = this.props
-    if (onClose) onClose(e, this.props)
+    _.invoke('onClose', this.props, e, this.props)
 
     this.trySetState({
       open: false,
@@ -242,22 +239,6 @@ export default class Datetime extends Component {
   }
 
   toggle = (e) => this.state.open ? this.close(e) : this.open(e)
-
-  handleOpen = (e) => {
-    debug('handleOpen()', e)
-    const { onOpen } = this.props
-    if (onOpen) onOpen(e, this.props)
-
-    this.open(e)
-  }
-
-  handleClose = (e) => {
-    debug('handleClose()', e)
-    const { onClose } = this.props
-    if (onClose) onClose(e, this.props)
-
-    this.close(e)
-  }
 
   handleDateSelection = (e, date, nextMode, rangeStart) => {
     debug('handleDateSelection()', date, e)
@@ -346,8 +327,8 @@ export default class Datetime extends Component {
         trigger={inputElement}
         position='bottom left'
         open={open}
-        onOpen={this.handleOpen}
-        onClose={this.handleClose}
+        onOpen={this.open}
+        onClose={this.close}
       >
         <Calendar
           mode={mode}
