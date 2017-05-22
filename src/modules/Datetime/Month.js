@@ -184,7 +184,7 @@ export default class Month extends Component {
   }
 
   render() {
-    // TODO factor out for DateTimeGrid
+    // TODO factor out for DatetimeGrid
     return (
       <Table unstackable basic='very' attached='bottom' size='small' compact='very' className='center aligned'>
         <Table.Header>

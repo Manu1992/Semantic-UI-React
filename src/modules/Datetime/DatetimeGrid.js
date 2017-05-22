@@ -10,9 +10,9 @@ const pointingStyle = { cursor: 'pointer' }
 const cellStyle = { border: 'none' }
 
 /**
- * A DateTimeGrid displays a grid of options in a DateTime component.
+ * A DatetimeGrid displays a grid of options in a Datetime component.
  */
-const DateTimeGrid = props => {
+const DatetimeGrid = props => {
   const { headers = [], columns, cells } = props
   const colSpan = Math.round(columns / headers.length)
 
@@ -44,7 +44,7 @@ const DateTimeGrid = props => {
   )
 }
 
-DateTimeGrid.propTypes = {
+DatetimeGrid.propTypes = {
   headers: PropTypes.arrayOf(PropTypes.string).isRequired,
   columns: PropTypes.number,
   cells: PropTypes.arrayOf(PropTypes.shape({
@@ -52,4 +52,4 @@ DateTimeGrid.propTypes = {
   })),
 }
 
-export default DateTimeGrid
+export default DatetimeGrid

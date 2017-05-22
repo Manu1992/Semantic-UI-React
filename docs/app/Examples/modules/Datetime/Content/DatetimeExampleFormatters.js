@@ -13,7 +13,7 @@ const timeFormatter = (date) => {
   return ''
 }
 
-const DateTimeExampleFormatters = () => (
+const DatetimeExampleFormatters = () => (
   <Datetime
     time
     defaultValue={new Date()}
@@ -22,4 +22,4 @@ const DateTimeExampleFormatters = () => (
   />
 )
 
-export default DateTimeExampleFormatters
+export default DatetimeExampleFormatters

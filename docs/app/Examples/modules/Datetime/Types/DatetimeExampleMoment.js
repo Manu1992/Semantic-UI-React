@@ -3,7 +3,7 @@ import { Datetime } from 'semantic-ui-react'
 import moment from 'moment-timezone'
 import 'moment/locale/en-gb'
 
-const DateTimeExampleMoment = () => (
+const DatetimeExampleMoment = () => (
   <Datetime
     time
     dateHandler='moment'
@@ -11,4 +11,4 @@ const DateTimeExampleMoment = () => (
   />
 )
 
-export default DateTimeExampleMoment
+export default DatetimeExampleMoment
