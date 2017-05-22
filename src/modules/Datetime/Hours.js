@@ -7,7 +7,7 @@ import {
   META,
 } from '../../lib'
 
-import DateTimeGrid from './DateTimeGrid'
+import DatetimeGrid from './DatetimeGrid'
 
 /**
  * A day cell within a calendar month
@@ -62,7 +62,7 @@ export default class Hours extends Component {
 
   render() {
     return (
-      <DateTimeGrid
+      <DatetimeGrid
         headers={['Hour']}
         columns={4}
         cells={this.getHours()}

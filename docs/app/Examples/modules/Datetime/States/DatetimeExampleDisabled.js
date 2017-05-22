@@ -1,8 +1,8 @@
 import React from 'react'
 import { Datetime } from 'semantic-ui-react'
 
-const DateTimeExampleDisabled = () => (
+const DatetimeExampleDisabled = () => (
   <Datetime time={false} placeholder='Disabled Date' disabled />
 )
 
-export default DateTimeExampleDisabled
+export default DatetimeExampleDisabled

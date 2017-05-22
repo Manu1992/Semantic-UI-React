@@ -1,7 +1,7 @@
 import React from 'react'
 import { Datetime } from 'semantic-ui-react'
 
-const DateTimeExampleStartSunday = () => (
+const DatetimeExampleStartSunday = () => (
   <div className='ui two column grid'>
     <div className='column'>
       <Datetime time={false} placeholder='Week starts Sunday' firstDayOfWeek={0} />
@@ -12,4 +12,4 @@ const DateTimeExampleStartSunday = () => (
   </div>
 )
 
-export default DateTimeExampleStartSunday
+export default DatetimeExampleStartSunday

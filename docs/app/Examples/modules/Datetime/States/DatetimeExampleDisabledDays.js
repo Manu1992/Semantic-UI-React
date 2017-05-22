@@ -18,7 +18,7 @@ const disabledDates = [
   new Date(),
   tomorrow(),
 ]
-const DateTimeExampleDisabledDays = () => (
+const DatetimeExampleDisabledDays = () => (
   <Datetime
     time={false}
     placeholder='Disabled days'
@@ -26,4 +26,4 @@ const DateTimeExampleDisabledDays = () => (
   />
 )
 
-export default DateTimeExampleDisabledDays
+export default DatetimeExampleDisabledDays

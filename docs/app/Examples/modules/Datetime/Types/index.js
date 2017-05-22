@@ -7,22 +7,22 @@ const DatetimeTypesExamples = () => (
     <ComponentExample
       title='Date and Time'
       description='A full Date and Time selector, with initial value of the current date and time'
-      examplePath='modules/Datetime/Types/DateTimeExampleFull'
+      examplePath='modules/Datetime/Types/DatetimeExampleFull'
     />
     <ComponentExample
       title='Date and Time using Moment-Timezone dates'
       description=''
-      examplePath='modules/Datetime/Types/DateTimeExampleMoment'
+      examplePath='modules/Datetime/Types/DatetimeExampleMoment'
     />
     <ComponentExample
       title='Date'
       description='A date only Date selector'
-      examplePath='modules/Datetime/Types/DateTimeExampleDateOnly'
+      examplePath='modules/Datetime/Types/DatetimeExampleDateOnly'
     />
     <ComponentExample
       title='First Day Of Week'
       description='Set the first day of the week to either Monday or Sunday'
-      examplePath='modules/Datetime/Types/DateTimeExampleFirstWeekDay'
+      examplePath='modules/Datetime/Types/DatetimeExampleFirstWeekDay'
     />
     <ComponentExample
       title='Time'

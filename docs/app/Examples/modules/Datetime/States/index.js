@@ -10,17 +10,17 @@ const DatetimeStatesExamples = () => (
         'A calendar can specify a set of disabled dates.',
         'This example has today, yesterday and tomorrow disabled.',
       ].join(' ')}
-      examplePath='modules/Datetime/States/DateTimeExampleDisabledDays'
+      examplePath='modules/Datetime/States/DatetimeExampleDisabledDays'
     />
     <ComponentExample
       title='Error'
       description='A calendar can show an error state'
-      examplePath='modules/Datetime/States/DateTimeExampleError'
+      examplePath='modules/Datetime/States/DatetimeExampleError'
     />
     <ComponentExample
       title='Disabled'
       description='A calendar can be disabled'
-      examplePath='modules/Datetime/States/DateTimeExampleDisabled'
+      examplePath='modules/Datetime/States/DatetimeExampleDisabled'
     />
   </ExampleSection>
 )

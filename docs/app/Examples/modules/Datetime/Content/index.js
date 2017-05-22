@@ -7,7 +7,7 @@ const DatetimeContentExamples = () => (
     <ComponentExample
       title='Using custom Date and Time formatters'
       description='A date time component can use custom date and time formatting functions.'
-      examplePath='modules/Datetime/Content/DateTimeExampleFormatters'
+      examplePath='modules/Datetime/Content/DatetimeExampleFormatters'
     />
   </ExampleSection>
 )
