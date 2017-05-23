@@ -26,7 +26,7 @@ export default class Months extends Component {
     type: META.TYPES.MODULE,
   }
 
-  getMonths() {
+  getCells() {
     const { onClick } = this.props
 
     return _.times(i => {
@@ -42,7 +42,7 @@ export default class Months extends Component {
     return (
       <DatetimeGrid
         columns={3}
-        cells={this.getMonths()}
+        cells={this.getCells()}
       />
     )
   }

@@ -26,7 +26,7 @@ export default class Years extends Component {
     type: META.TYPES.MODULE,
   }
 
-  getYears() {
+  getCells() {
     const { onClick, year } = this.props
     const range = 4
     const startYear = year - range
@@ -44,7 +44,7 @@ export default class Years extends Component {
     return (
       <DatetimeGrid
         columns={3}
-        cells={this.getYears()}
+        cells={this.getCells()}
       />
     )
   }
