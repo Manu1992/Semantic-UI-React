@@ -47,7 +47,7 @@ export default class Hours extends Component {
     }, 24)
   }
 
-  getHours() {
+  getCells() {
     const { onClick } = this.props
     const labels = this.getHourLabels()
 
@@ -65,7 +65,7 @@ export default class Hours extends Component {
       <DatetimeGrid
         headers={['Hour']}
         columns={4}
-        cells={this.getHours()}
+        cells={this.getCells()}
       />
     )
   }

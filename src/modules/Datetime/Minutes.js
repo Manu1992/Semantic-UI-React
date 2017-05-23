@@ -59,7 +59,7 @@ export default class Minutes extends Component {
     }, count)
   }
 
-  getMinutes() {
+  getCells() {
     const { onClick, interval } = this.props
     const labels = this.getMinuteLabels()
     return _.times(i => {
@@ -76,7 +76,7 @@ export default class Minutes extends Component {
       <DatetimeGrid
         headers={['Minute']}
         columns={4}
-        cells={this.getMinutes()}
+        cells={this.getCells()}
       />
     )
   }
