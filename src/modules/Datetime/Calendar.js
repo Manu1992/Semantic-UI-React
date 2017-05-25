@@ -37,6 +37,17 @@ export default class Calendar extends Component {
     /** Enables date selection. */
     date: PropTypes.bool,
 
+    /**
+     * Formats the date string in the input and calendar.
+     *
+     * @param {date} - A date object.
+     * @returns {string} - A formatted date string.
+     */
+    dateFormatter: PropTypes.func,
+
+    // TODO doc
+    dateHandler: PropTypes.func,
+
     /** The initial value for selectionEnd. */
     defaultSelectionEnd: customPropTypes.DateValue,
 
@@ -73,18 +84,25 @@ export default class Calendar extends Component {
     /** Render two calendars for selecting the start and end of a range. */
     range: PropTypes.bool,
 
-    /** Enables time selection. */
-    time: PropTypes.bool,
-
     /** Dates until or at selectionEnd are marked as selected. */
     selectionEnd: customPropTypes.DateValue,
 
     /** Dates at or after selectionStart are marked as selected. */
     selectionStart: customPropTypes.DateValue,
 
+    /** Enables time selection. */
+    time: PropTypes.bool,
+
+    /**
+     * Formats the time string in the input and calendar.
+     *
+     * @param {date} - A date object.
+     * @returns {string} - A formatted time string.
+     */
+    timeFormatter: PropTypes.func,
+
     /** Current value as a Date object or a string that can be parsed into one. */
     value: customPropTypes.DateValue,
-    dateHandler: PropTypes.func,
   }
 
   static defaultProps = {
@@ -189,7 +207,7 @@ export default class Calendar extends Component {
     onDateSelect(e, selectedDate, nextMode, range ? date : null)
   }
 
-  page = (direction, e) => {
+  page = (direction) => (e) => {
     e.stopPropagation()
     const { mode } = this.props
     switch (mode) {
@@ -212,9 +230,9 @@ export default class Calendar extends Component {
 
   /**
    * Change the calendar mode from day to month or year selection
-   * @param  {string} mode One of day, month or year
-   * @param  {[type]} e    [description]
-   * @return {[type]}      [description]
+   *
+   * @param {string} mode - One of day, month or year
+   * @param {SyntheticEvent} e
    */
   changeMode = (mode, e) => {
     e.stopPropagation()
@@ -225,16 +243,19 @@ export default class Calendar extends Component {
   /**
    * Returns the calendar body content
    */
-  getBodyContent() {
+  renderBody() {
     const {
       content,
       firstDayOfWeek,
+      dateFormatter,
       disabledDates,
       mode,
       value,
       selectionStart,
       selectionEnd,
+      timeFormatter,
     } = this.props
+
     switch (mode) {
       case 'day':
         return (
@@ -270,6 +291,7 @@ export default class Calendar extends Component {
   render() {
     const { date, mode } = this.props
     const calendarDay = this.getDate()
+
     return (
       <div style={style}>
         {date && (
@@ -278,14 +300,13 @@ export default class Calendar extends Component {
             monthName={this.getMonthName()}
             year={this.getYear()}
             mode={mode}
-            onPrevious={this.page.bind(this, -1)}
-            onNext={this.page.bind(this, 1)}
+            onPrevious={this.page(-1)}
+            onNext={this.page(1)}
             onChangeMode={this.changeMode}
           />
         )}
-        {this.getBodyContent()}
+        {this.renderBody()}
       </div>
-
     )
   }
 }

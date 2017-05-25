@@ -38,7 +38,7 @@ export function getNativeDateHandler(settings = {}) {
     /**
      * Pad a number with a zero if it's one digit
      * @param  {number} n
-     * @return {string} Returns the number padded with a zero if below 10
+     * @returns {string} Returns the number padded with a zero if below 10
      */
     zeroPad(n) {
       return (n < 10 ? '0' : '') + n

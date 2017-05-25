@@ -17,7 +17,7 @@ const DatetimeGrid = props => {
   const colSpan = Math.round(columns / headers.length)
 
   return (
-    <Table unstackable basic='very' attached='bottom' size='small' compact='very' textAlign='center'>
+    <Table fixed singleLine unstackable basic='very' attached='bottom' size='small' compact='very' textAlign='center'>
       <Table.Header>
         <Table.Row>
           {headers.map((header, i) => (
