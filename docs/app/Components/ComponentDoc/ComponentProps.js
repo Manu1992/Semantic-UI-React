@@ -25,7 +25,7 @@ Extra.propTypes = {
   title: PropTypes.node,
 }
 
-const getTagType = tag => tag.type.type === 'AllLiteral' ? 'any' : tag.type.name
+const getTagType = tag => _.get(tag, 'type.type') === 'AllLiteral' ? 'any' : _.get(tag, 'type.name')
 
 /**
  * Displays a table of a Component's PropTypes.

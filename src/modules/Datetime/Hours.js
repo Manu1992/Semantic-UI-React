@@ -18,10 +18,12 @@ export default class Hours extends Component {
     onClick: PropTypes.func,
 
     /**
-     * A function that will return the time image of a Date object as a formatted
-     * string in the current locale. By default the time will be formatted as HH:MM
+     * Formats the time string shown in the calendar selector.
+     *
+     * @param {date} - A date object.
+     * @returns {string} - A formatted time string.
      */
-    timeFormatter: PropTypes.func,
+    formatter: PropTypes.func,
   }
 
   static _meta = {
@@ -31,19 +33,19 @@ export default class Hours extends Component {
   }
 
   static defaultProps = {
-    timeFormatter: utils.defaultTimeFormatter,
+    formatter: utils.defaultHourFormatter,
     firstHourOfDay: 0,
     LastHourOfDay: 23,
   }
 
   getHourLabels() {
-    const { timeFormatter } = this.props
+    const { formatter } = this.props
     const date = new Date()
     date.setMinutes(0)
 
     return _.times(hour => {
       date.setHours(hour)
-      return timeFormatter(date)
+      return formatter(date)
     }, 24)
   }
 

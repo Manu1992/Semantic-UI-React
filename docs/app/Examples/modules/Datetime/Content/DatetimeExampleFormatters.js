@@ -1,16 +1,15 @@
 import React from 'react'
 import { Datetime } from 'semantic-ui-react'
 
-// Return locale formatted date string
-const dateFormatter = (date) => !!date ? date.toLocaleDateString() : ''
+// IE or standard language
+const locale = navigator.userLanguage || navigator.language
 
-// Returns locale formatted time with the seconds removed
-const timeFormatter = (date) => {
-  if (!!date) {
-    const timeString = date.toLocaleTimeString()
-    return timeString.split(':').slice(0, 2).join(':')
-  }
-  return ''
+// Locale formatted date
+const dateFormatter = date => date.toLocaleDateString(locale)
+
+// Locale formatted 12-hour time with seconds removed
+const timeFormatter = date => {
+  return date.toLocaleTimeString(locale, { hour12: true }).replace(/:\d+ /, ' ')
 }
 
 const DatetimeExampleFormatters = () => (

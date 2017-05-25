@@ -25,9 +25,10 @@ export default class Minutes extends Component {
     onClick: PropTypes.func,
 
     /**
-     * A function that will return the time image of a Date object as a formatted
-     * string in the current locale. By default the time will be formatted as HH:MM
-     * @type {function}
+     * Formats the time string in the input and calendar.
+     *
+     * @param {date} - A date object.
+     * @returns {string} - A formatted time string.
      */
     timeFormatter: PropTypes.func,
   }

@@ -65,9 +65,10 @@ export default class DateRange extends Component {
     date: PropTypes.bool,
 
     /**
-     * A function that will return a Date object as a formatted string in the
-     * current locale. By default the Date will formatted as YYYY-MM-DD
-     * @type {function}
+     * Formats the date string in the input and calendar.
+     *
+     * @param {date} - A date object.
+     * @returns {string} - A formatted date string.
      */
     dateFormatter: PropTypes.func,
 
@@ -158,10 +159,11 @@ export default class DateRange extends Component {
     timeZone: PropTypes.string,
 
     /**
-     * A function that will return the time image of a Date object as a formatted
-     * string in the current locale. By default the time will be formatted as HH:MM.
+     * Formats the time string in the input and calendar.
+     *
+     * @param {date} - A date object.
+     * @returns {string} - A formatted time string.
      */
-    // TODO add signature
     timeFormatter: PropTypes.func,
 
     /** Current value as an array of Date object or a string that can be parsed into one. */

@@ -58,7 +58,6 @@ export default class Datetime extends Component {
      *   am: 'AM',
      *   pm: 'PM',
      * }
-     * @type {Object}
      */
     content: PropTypes.object,
 
@@ -66,14 +65,12 @@ export default class Datetime extends Component {
     date: PropTypes.bool,
 
     /**
-     * A function that will return a Date object as a formatted string in the
-     * current locale. By default the Date will formatted as YYYY-MM-DD
-     * @type {function}
+     * Formats the date string in the input and calendar.
+     *
+     * @param {date} - A date object.
+     * @returns {string} - A formatted date string.
      */
     dateFormatter: PropTypes.func,
-
-    /** A disabled dropdown menu or item does not allow user interaction. */
-    disabled: PropTypes.bool,
 
     /** An array of dates that should be marked disabled in the calendar. */
     disabledDates: PropTypes.arrayOf(customPropTypes.DateValue),
@@ -143,9 +140,10 @@ export default class Datetime extends Component {
     time: PropTypes.bool,
 
     /**
-     * A function that will return the time image of a Date object as a formatted
-     * string in the current locale. By default the time will be formatted as HH:MM
-     * @type {function}
+     * Formats the time string in the input and calendar.
+     *
+     * @param {date} - A date object.
+     * @returns {string} - A formatted time string.
      */
     timeFormatter: PropTypes.func,
 
@@ -293,6 +291,7 @@ export default class Datetime extends Component {
       placeholder,
       time,
       date,
+      dateFormatter,
       timeFormatter,
       minDate,
       disabledDates,
@@ -336,6 +335,7 @@ export default class Datetime extends Component {
           dateHandler={this.Date}
           onDateSelect={this.handleDateSelection}
           onChangeMonth={this.onSetMonth}
+          dateFormatter={dateFormatter}
           timeFormatter={timeFormatter}
           firstDayOfWeek={firstDayOfWeek}
           time={time}

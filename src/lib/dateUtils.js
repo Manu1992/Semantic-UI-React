@@ -1,7 +1,7 @@
 /**
  * Pad a number with a zero if it's one digit
  * @param  {number} n
- * @return {string} Returns the number padded with a zero if below 10
+ * @returns {string} Returns the number padded with a zero if below 10
  */
 export function zeroPad(n) {
   return (n < 10 ? '0' : '') + n
@@ -52,12 +52,27 @@ export function defaultDateFormatter(date) {
   return !!date ? `${date.getFullYear()}-${zeroPad(date.getMonth() + 1)}-${zeroPad(date.getDate())}` : ''
 }
 
+function ampmFormatter(date) {
+  if (!date) return ''
+  return date.getHours() > 11 ? 'pm' : 'am'
+}
+
+export function defaultHourFormatter(date) {
+  if (!date) return ''
+  return (date.getHours() % 12 || 12) + ampmFormatter(date)
+}
+
+function defaultMinuteFormatter(date) {
+  if (!date) return ''
+  return zeroPad(date.getMinutes())
+}
+
 /**
  * Default time formatter, 24 hour clock.
  * Returns a string as formatted time.
  * @param  {Date} date
- * @return {string}
+ * @returns {string}
  */
 export function defaultTimeFormatter(date) {
-  return !!date ? `${zeroPad(date.getHours())}:${zeroPad(date.getMinutes())}` : ''
+  return !!date ? `${date.getHours() % 12 || 12}:${defaultMinuteFormatter(date)}${ampmFormatter(date)}` : ''
 }
