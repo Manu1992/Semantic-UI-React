@@ -219,7 +219,7 @@ class DatetimeExampleFull extends Component {
     const labelSizeEM = sizeEM / 5
 
     return (
-      <div style={{ textAlign: 'center' }}>
+      <div>
         <Datetime time defaultValue={new Date()} />
         <br />
         <br />
@@ -298,7 +298,6 @@ class DatetimeExampleFull extends Component {
                   height: '1em',
                   lineHeight: 1,
                   fontSize: '0.45em',
-                  fontWeight: !isAM(dateHours) ? 'normal' : 'bold',
                   background: 'none',
                   border: 'none',
                   opacity: !isAM(dateHours) ? 0.4 : 1,
@@ -314,7 +313,6 @@ class DatetimeExampleFull extends Component {
                   height: '1em',
                   lineHeight: 1,
                   fontSize: '0.45em',
-                  fontWeight: isAM(dateHours) ? 'normal' : 'bold',
                   background: 'none',
                   border: 'none',
                   opacity: isAM(dateHours) ? 0.4 : 1,

@@ -5,16 +5,6 @@ import ExampleSection from 'docs/app/Components/ComponentDoc/ExampleSection'
 const DatetimeTypesExamples = () => (
   <ExampleSection title='Types'>
     <ComponentExample
-      title='Date and Time'
-      description='A full Date and Time selector, with initial value of the current date and time'
-      examplePath='modules/Datetime/Types/DatetimeExampleFull'
-    />
-    <ComponentExample
-      title='Date and Time using Moment-Timezone dates'
-      description=''
-      examplePath='modules/Datetime/Types/DatetimeExampleMoment'
-    />
-    <ComponentExample
       title='Date'
       description='A date only Date selector'
       examplePath='modules/Datetime/Types/DatetimeExampleDateOnly'
@@ -28,6 +18,16 @@ const DatetimeTypesExamples = () => (
       title='Time'
       description='A full Time selector, with initial value of the current time'
       examplePath='modules/Datetime/Types/TimeExampleFull'
+    />
+    <ComponentExample
+      title='Date and Time'
+      description='A full Date and Time selector, with initial value of the current date and time'
+      examplePath='modules/Datetime/Types/DatetimeExampleFull'
+    />
+    <ComponentExample
+      title='Date and Time using Moment-Timezone dates'
+      description=''
+      examplePath='modules/Datetime/Types/DatetimeExampleMoment'
     />
     <ComponentExample
       title='Range'
