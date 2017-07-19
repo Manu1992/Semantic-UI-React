@@ -1,6 +1,12 @@
 import * as React from 'react';
 
-interface FeedContentProps {
+import { SemanticShorthandContent, SemanticShorthandItem } from '../..';
+import { FeedDateProps } from './FeedDate';
+import { FeedExtraProps } from './FeedExtra';
+import { FeedMetaProps } from './FeedMeta';
+import { FeedSummaryProps } from './FeedSummary';
+
+export interface FeedContentProps {
   [key: string]: any;
 
   /** An element type to render as (string or function). */
@@ -13,22 +19,22 @@ interface FeedContentProps {
   className?: string;
 
   /** Shorthand for primary content. */
-  content?: React.ReactNode;
+  content?: SemanticShorthandContent;
 
   /** An event can contain a date. */
-  date?: any;
+  date?: SemanticShorthandItem<FeedDateProps>;
 
   /** Shorthand for FeedExtra with images. */
-  extraImages?: any;
+  extraImages?: SemanticShorthandItem<FeedExtraProps>;
 
   /** Shorthand for FeedExtra with text. */
-  extraText?: any;
+  extraText?: SemanticShorthandItem<FeedExtraProps>;
 
   /** Shorthand for FeedMeta. */
-  meta?: any;
+  meta?: SemanticShorthandItem<FeedMetaProps>;
 
   /** Shorthand for FeedSummary. */
-  summary?: any;
+  summary?: SemanticShorthandItem<FeedSummaryProps>;
 }
 
 declare const FeedContent: React.StatelessComponent<FeedContentProps>;

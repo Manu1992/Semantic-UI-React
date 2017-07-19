@@ -76,6 +76,22 @@ const DropdownUsageExamples = () => (
       description='A dropdown item can be rendered differently inside the menu.'
       examplePath='modules/Dropdown/Usage/DropdownExampleItemContent'
     />
+    <ComponentExample
+      title='Search Input'
+      description='A dropdown implements a search input shorthand.'
+      examplePath='modules/Dropdown/Usage/DropdownExampleSearchInput'
+    />
+    <ComponentExample
+      title='Upward'
+      description='A dropdown can open its menu upward.'
+      examplePath='modules/Dropdown/Usage/DropdownExampleUpwardSelection'
+    />
+    <ComponentExample
+      examplePath='modules/Dropdown/Usage/DropdownExampleUpwardInline'
+    />
+    <ComponentExample
+      examplePath='modules/Dropdown/Usage/DropdownExampleUpward'
+    />
 
   </ExampleSection>
 )

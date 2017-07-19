@@ -1,8 +1,9 @@
-import _ from 'lodash'
 import cx from 'classnames'
-import React, { Component, PropTypes } from 'react'
+import PropTypes from 'prop-types'
+import React, { Component } from 'react'
 
 import {
+  childrenUtils,
   customPropTypes,
   getElementType,
   getUnhandledProps,
@@ -111,7 +112,7 @@ export default class Step extends Component {
       if (onClick) return 'a'
     })
 
-    if (!_.isNil(children)) {
+    if (!childrenUtils.isNil(children)) {
       return <ElementType {...rest} className={classes} href={href} onClick={this.handleClick}>{children}</ElementType>
     }
 

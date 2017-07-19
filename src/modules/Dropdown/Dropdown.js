@@ -1,10 +1,11 @@
 import cx from 'classnames'
 import _ from 'lodash'
-import React, { Children, cloneElement, PropTypes } from 'react'
+import PropTypes from 'prop-types'
+import React, { Children, cloneElement } from 'react'
 
 import {
   AutoControlledComponent as Component,
-  createShorthand,
+  childrenUtils,
   customPropTypes,
   getElementType,
   getUnhandledProps,
@@ -22,8 +23,11 @@ import DropdownDivider from './DropdownDivider'
 import DropdownItem from './DropdownItem'
 import DropdownHeader from './DropdownHeader'
 import DropdownMenu from './DropdownMenu'
+import DropdownSearchInput from './DropdownSearchInput'
 
 const debug = makeDebugger('dropdown')
+
+const getKeyOrValue = (key, value) => _.isNil(key) ? value : key
 
 /**
  * A dropdown allows a user to select a value from a series of options.
@@ -65,7 +69,7 @@ export default class Dropdown extends Component {
       customPropTypes.disallow(['options', 'selection']),
       customPropTypes.givenProps(
         { children: PropTypes.any.isRequired },
-        React.PropTypes.element.isRequired,
+        PropTypes.element.isRequired,
       ),
     ]),
 
@@ -140,11 +144,11 @@ export default class Dropdown extends Component {
     /** A dropdown can show that it is currently loading data. */
     loading: PropTypes.bool,
 
+    /** The minimum characters for a search to begin showing results. */
+    minCharacters: PropTypes.number,
+
     /** A selection dropdown can allow multiple selections. */
     multiple: PropTypes.bool,
-
-    /** Name of the hidden input which holds the value. */
-    name: PropTypes.string,
 
     /** Message to display when there are no results. */
     noResultsMessage: PropTypes.string,
@@ -273,6 +277,13 @@ export default class Dropdown extends Component {
       PropTypes.func,
     ]),
 
+    /** A shorthand for a search input. */
+    searchInput: PropTypes.oneOfType([
+      PropTypes.array,
+      PropTypes.node,
+      PropTypes.object,
+    ]),
+
     // TODO 'searchInMenu' or 'search='in menu' or ???  How to handle this markup and functionality?
 
     /** Define whether the highlighted item should be selected on blur. */
@@ -321,23 +332,28 @@ export default class Dropdown extends Component {
         PropTypes.number,
       ])),
     ]),
+
+    /** A dropdown can open upward. */
+    upward: PropTypes.bool,
   }
 
   static defaultProps = {
     additionLabel: 'Add ',
     additionPosition: 'top',
-    icon: 'dropdown',
-    noResultsMessage: 'No results found.',
-    renderLabel: ({ text }) => text,
-    selectOnBlur: true,
-    openOnFocus: true,
     closeOnBlur: true,
+    icon: 'dropdown',
+    minCharacters: 1,
+    noResultsMessage: 'No results found.',
+    openOnFocus: true,
+    renderLabel: ({ text }) => text,
+    searchInput: 'text',
+    selectOnBlur: true,
   }
 
   static autoControlledProps = [
     'open',
-    'value',
     'selectedLabel',
+    'value',
   ]
 
   static _meta = {
@@ -349,9 +365,9 @@ export default class Dropdown extends Component {
   static Header = DropdownHeader
   static Item = DropdownItem
   static Menu = DropdownMenu
+  static SearchInput = DropdownSearchInput
 
   componentWillMount() {
-    if (super.componentWillMount) super.componentWillMount()
     debug('componentWillMount()')
     const { open, value } = this.state
 
@@ -411,9 +427,11 @@ export default class Dropdown extends Component {
     if (!prevState.focus && this.state.focus) {
       debug('dropdown focused')
       if (!this.isMouseDown) {
-        const { openOnFocus } = this.props
+        const { minCharacters, openOnFocus, search } = this.props
+        const openable = !search || (search && minCharacters === 1)
+
         debug('mouse is not down, opening')
-        if (openOnFocus) this.open()
+        if (openOnFocus && openable) this.open()
       }
       if (!this.state.open) {
         document.addEventListener('keydown', this.openOnArrow)
@@ -447,6 +465,7 @@ export default class Dropdown extends Component {
       document.addEventListener('click', this.closeOnDocumentClick)
       document.removeEventListener('keydown', this.openOnArrow)
       document.removeEventListener('keydown', this.openOnSpace)
+      this.scrollSelectedItemIntoView()
     } else if (prevState.open && !this.state.open) {
       debug('dropdown closed')
       this.handleClose()
@@ -482,10 +501,8 @@ export default class Dropdown extends Component {
   // onChange needs to receive a value
   // can't rely on props.value if we are controlled
   handleChange = (e, value) => {
-    debug('handleChange()')
-    debug(value)
-    const { onChange } = this.props
-    if (onChange) onChange(e, { ...this.props, value })
+    debug('handleChange()', value)
+    _.invoke(this.props, 'onChange', e, { ...this.props, value })
   }
 
   closeOnChange = (e) => {
@@ -504,20 +521,19 @@ export default class Dropdown extends Component {
   }
 
   moveSelectionOnKeyDown = (e) => {
-    debug('moveSelectionOnKeyDown()')
-    debug(keyboardKey.getName(e))
-    switch (keyboardKey.getCode(e)) {
-      case keyboardKey.ArrowDown:
-        e.preventDefault()
-        this.moveSelectionBy(1)
-        break
-      case keyboardKey.ArrowUp:
-        e.preventDefault()
-        this.moveSelectionBy(-1)
-        break
-      default:
-        break
+    debug('moveSelectionOnKeyDown()', keyboardKey.getName(e))
+
+    const { multiple } = this.props
+    const moves = {
+      [keyboardKey.ArrowDown]: 1,
+      [keyboardKey.ArrowUp]: -1,
     }
+    const move = moves[keyboardKey.getCode(e)]
+
+    if (move === undefined) return
+    e.preventDefault()
+    this.moveSelectionBy(move)
+    if (!multiple) this.makeSelectedItemActive(e)
   }
 
   openOnSpace = (e) => {
@@ -570,11 +586,13 @@ export default class Dropdown extends Component {
   }
 
   selectItemOnEnter = (e) => {
-    debug('selectItemOnEnter()')
-    debug(keyboardKey.getName(e))
+    debug('selectItemOnEnter()', keyboardKey.getName(e))
+    const { search } = this.props
+
     if (keyboardKey.getCode(e) !== keyboardKey.Enter) return
     e.preventDefault()
 
+    if (search && _.isEmpty(this.getMenuOptions())) return
     this.makeSelectedItemActive(e)
     this.closeOnChange(e)
   }
@@ -614,29 +632,34 @@ export default class Dropdown extends Component {
 
   handleMouseDown = (e) => {
     debug('handleMouseDown()')
-    const { onMouseDown } = this.props
-    if (onMouseDown) onMouseDown(e, this.props)
+
     this.isMouseDown = true
+    _.invoke(this.props, 'onMouseDown', e, this.props)
     // Do not access document when server side rendering
-    if (!isBrowser) return
-    document.addEventListener('mouseup', this.handleDocumentMouseUp)
+    if (isBrowser) document.addEventListener('mouseup', this.handleDocumentMouseUp)
   }
 
   handleDocumentMouseUp = () => {
     debug('handleDocumentMouseUp()')
+
     this.isMouseDown = false
     // Do not access document when server side rendering
-    if (!isBrowser) return
-    document.removeEventListener('mouseup', this.handleDocumentMouseUp)
+    if (isBrowser) document.removeEventListener('mouseup', this.handleDocumentMouseUp)
   }
 
-  handleClick = (e) => {
+  handleClick = e => {
     debug('handleClick()', e)
-    const { onClick } = this.props
-    if (onClick) onClick(e, this.props)
+
+    const { minCharacters, search } = this.props
+    const { open, searchQuery } = this.state
+
+    _.invoke(this.props, 'onClick', e, this.props)
     // prevent closeOnDocumentClick()
     e.stopPropagation()
-    this.toggle(e)
+
+    if (!search) return this.toggle(e)
+    if (open) return
+    if (searchQuery.length >= minCharacters || minCharacters === 1) this.open(e)
   }
 
   handleItemClick = (e, item) => {
@@ -673,15 +696,22 @@ export default class Dropdown extends Component {
 
   handleFocus = (e) => {
     debug('handleFocus()')
-    const { onFocus } = this.props
     const { focus } = this.state
+
     if (focus) return
-    if (onFocus) onFocus(e, this.props)
+
+    _.invoke(this.props, 'onFocus', e, this.props)
     this.setState({ focus: true })
   }
 
-  handleBlur = (e) => {
+  handleBlur = e => {
     debug('handleBlur()')
+
+    // Heads up! Don't remove this.
+    // https://github.com/Semantic-Org/Semantic-UI-React/issues/1315
+    const currentTarget = _.get(e, 'currentTarget')
+    if (currentTarget && currentTarget.contains(document.activeElement)) return
+
     const { closeOnBlur, multiple, onBlur, selectOnBlur } = this.props
     // do not "blur" when the mouse is down inside of the Dropdown
     if (this.isMouseDown) return
@@ -693,24 +723,30 @@ export default class Dropdown extends Component {
     this.setState({ focus: false, searchQuery: '' })
   }
 
-  handleSearchChange = (e) => {
+  handleSearchChange = (e, { value }) => {
     debug('handleSearchChange()')
-    debug(e.target.value)
+    debug(value)
+
     // prevent propagating to this.props.onChange()
     e.stopPropagation()
-    const { search, onSearchChange } = this.props
+
+    const { minCharacters } = this.props
     const { open } = this.state
-    const newQuery = e.target.value
+    const newQuery = value
 
-    if (onSearchChange) onSearchChange(e, newQuery)
-
-    // open search dropdown on search query
-    if (search && newQuery && !open) this.open()
-
+    _.invoke(this.props, 'onSearchChange', e, newQuery)
     this.setState({
       selectedIndex: 0,
       searchQuery: newQuery,
     })
+
+    // open search dropdown on search query
+    if (!open && newQuery.length >= minCharacters) {
+      this.open()
+      return
+    }
+    // close search dropdown if search query is too small
+    if (open && minCharacters !== 1 && newQuery.length < minCharacters) this.close()
   }
 
   // ----------------------------------------
@@ -743,15 +779,16 @@ export default class Dropdown extends Component {
     // insert the "add" item
     if (allowAdditions && search && searchQuery && !_.some(filteredOptions, { text: searchQuery })) {
       const additionLabelElement = React.isValidElement(additionLabel)
-        ? React.cloneElement(additionLabel, { key: 'label' })
+        ? React.cloneElement(additionLabel, { key: 'addition-label' })
         : additionLabel || ''
 
       const addItem = {
+        key: 'addition',
         // by using an array, we can pass multiple elements, but when doing so
         // we must specify a `key` for React to know which one is which
         text: [
           additionLabelElement,
-          <b key='addition'>{searchQuery}</b>,
+          <b key='addition-query'>{searchQuery}</b>,
         ],
         value: searchQuery,
         className: 'addition',
@@ -934,13 +971,50 @@ export default class Dropdown extends Component {
   handleRef = c => (this.ref = c)
 
   // ----------------------------------------
+  // Helpers
+  // ----------------------------------------
+
+  computeSearchInputTabIndex = () => {
+    const { disabled, tabIndex } = this.props
+
+    if (!_.isNil(tabIndex)) return tabIndex
+    return disabled ? -1 : 0
+  }
+
+  computeSearchInputWidth = () => {
+    const { searchQuery } = this.state
+
+    if (this.sizerRef && searchQuery) {
+      // resize the search input, temporarily show the sizer so we can measure it
+
+      this.sizerRef.style.display = 'inline'
+      this.sizerRef.textContent = searchQuery
+      const searchWidth = Math.ceil(this.sizerRef.getBoundingClientRect().width)
+      this.sizerRef.style.removeProperty('display')
+
+      return searchWidth
+    }
+  }
+
+  computeTabIndex = () => {
+    const { disabled, search, tabIndex } = this.props
+
+    if (!_.isNil(tabIndex)) return tabIndex
+    // don't set a root node tabIndex as the search input has its own tabIndex
+    if (!search) return disabled ? -1 : 0
+  }
+
+  // ----------------------------------------
   // Behavior
   // ----------------------------------------
 
   scrollSelectedItemIntoView = () => {
     debug('scrollSelectedItemIntoView()')
+    if (!this.ref) return
     const menu = this.ref.querySelector('.menu.visible')
+    if (!menu) return
     const item = menu.querySelector('.item.selected')
+    if (!item) return
     debug(`menu: ${menu}`)
     debug(`item: ${item}`)
     const isOutOfUpperView = item.offsetTop < menu.scrollTop
@@ -962,6 +1036,7 @@ export default class Dropdown extends Component {
     if (onOpen) onOpen(e, this.props)
 
     this.trySetState({ open: true })
+    this.scrollSelectedItemIntoView()
   }
 
   close = (e) => {
@@ -990,7 +1065,7 @@ export default class Dropdown extends Component {
     this.setState({ focus: hasFocus })
   }
 
-  toggle = (e) => this.state.open ? this.close(e) : this.open(e)
+  toggle = e => this.state.open ? this.close(e) : this.open(e)
 
   // ----------------------------------------
   // Render
@@ -1019,63 +1094,21 @@ export default class Dropdown extends Component {
       _text = _.get(this.getItemByValue(value), 'text')
     }
 
-    return <div className={classes}>{_text}</div>
-  }
-
-  renderHiddenInput = () => {
-    debug('renderHiddenInput()')
-    const { value } = this.state
-    const { multiple, name, options, selection } = this.props
-    debug(`name:      ${name}`)
-    debug(`selection: ${selection}`)
-    debug(`value:     ${value}`)
-    if (!selection) return null
-
-    // a dropdown without an active item will have an empty string value
-    return (
-      <select type='hidden' aria-hidden='true' name={name} value={value} multiple={multiple}>
-        <option value='' />
-        {_.map(options, option => (
-          <option key={option.value} value={option.value}>{option.text}</option>
-        ))}
-      </select>
-    )
+    return <div className={classes} role='alert' aria-live='polite'>{_text}</div>
   }
 
   renderSearchInput = () => {
-    const { disabled, search, name, tabIndex } = this.props
+    const { search, searchInput } = this.props
     const { searchQuery } = this.state
 
     if (!search) return null
-
-    // tabIndex
-    let computedTabIndex
-    if (!_.isNil(tabIndex)) computedTabIndex = tabIndex
-    else computedTabIndex = disabled ? -1 : 0
-
-    // resize the search input, temporarily show the sizer so we can measure it
-    let searchWidth
-    if (this.sizerRef && searchQuery) {
-      this.sizerRef.style.display = 'inline'
-      this.sizerRef.textContent = searchQuery
-      searchWidth = Math.ceil(this.sizerRef.getBoundingClientRect().width)
-      this.sizerRef.style.removeProperty('display')
-    }
-
-    return (
-      <input
-        value={searchQuery}
-        type='text'
-        aria-autocomplete='list'
-        onChange={this.handleSearchChange}
-        className='search'
-        name={[name, 'search'].join('-')}
-        autoComplete='off'
-        tabIndex={computedTabIndex}
-        style={{ width: searchWidth }}
-        ref={this.handleSearchRef}
-      />
-    )
+    return DropdownSearchInput.create(searchInput, { defaultProps: {
+      inputRef: this.handleSearchRef,
+      onChange: this.handleSearchChange,
+      style: { width: this.computeSearchInputWidth() },
+      tabIndex: this.computeSearchInputTabIndex(),
+      value: searchQuery,
+    } })
   }
 
   renderSearchSizer = () => {
@@ -1098,18 +1131,18 @@ export default class Dropdown extends Component {
     // if no item could be found for a given state value the selected item will be undefined
     // compact the selectedItems so we only have actual objects left
     return _.map(_.compact(selectedItems), (item, index) => {
-      const defaultLabelProps = {
+      const defaultProps = {
         active: item.value === selectedLabel,
         as: 'a',
-        key: item.value,
+        key: getKeyOrValue(item.key, item.value),
         onClick: this.handleLabelClick,
         onRemove: this.handleLabelRemove,
         value: item.value,
       }
 
       return Label.create(
-        renderLabel(item, index, defaultLabelProps),
-        defaultLabelProps,
+        renderLabel(item, index, defaultProps),
+        { defaultProps }
       )
     })
   }
@@ -1127,17 +1160,15 @@ export default class Dropdown extends Component {
       ? optValue => _.includes(value, optValue)
       : optValue => optValue === value
 
-    return _.map(options, (opt, i) => (
-      <DropdownItem
-        key={`${opt.value}-${i}`}
-        active={isActive(opt.value)}
-        onClick={this.handleItemClick}
-        selected={selectedIndex === i}
-        {...opt}
-        // Needed for handling click events on disabled items
-        style={{ ...opt.style, pointerEvents: 'all' }}
-      />
-    ))
+    return _.map(options, (opt, i) => DropdownItem.create({
+      active: isActive(opt.value),
+      onClick: this.handleItemClick,
+      selected: selectedIndex === i,
+      ...opt,
+      key: getKeyOrValue(opt.key, opt.value),
+      // Needed for handling click events on disabled items
+      style: { ...opt.style, pointerEvents: 'all' },
+    }))
   }
 
   renderMenu = () => {
@@ -1147,7 +1178,7 @@ export default class Dropdown extends Component {
     const ariaOptions = this.getDropdownMenuAriaOptions()
 
     // single menu child
-    if (!_.isNil(children)) {
+    if (!childrenUtils.isNil(children)) {
       const menuChild = Children.only(children)
       const className = cx(menuClasses, menuChild.props.className)
 
@@ -1156,7 +1187,7 @@ export default class Dropdown extends Component {
 
     return (
       <DropdownMenu {...ariaOptions} className={menuClasses}>
-        {createShorthand(DropdownHeader, val => ({ content: val }), header)}
+        {DropdownHeader.create(header)}
         {this.renderOptions()}
       </DropdownMenu>
     )
@@ -1166,31 +1197,31 @@ export default class Dropdown extends Component {
     debug('render()')
     debug('props', this.props)
     debug('state', this.state)
-    const { open } = this.state
 
     const {
       basic,
       button,
       className,
       compact,
+      disabled,
+      error,
       fluid,
       floating,
       icon,
       inline,
       item,
       labeled,
+      loading,
       multiple,
       pointing,
       search,
       selection,
-      simple,
-      loading,
-      error,
-      disabled,
       scrolling,
-      tabIndex,
+      simple,
       trigger,
+      upward,
     } = this.props
+    const { open } = this.state
 
     // Classes
     const classes = cx(
@@ -1217,22 +1248,15 @@ export default class Dropdown extends Component {
       useKeyOnly(selection, 'selection'),
       useKeyOnly(simple, 'simple'),
       useKeyOnly(scrolling, 'scrolling'),
+      useKeyOnly(upward, 'upward'),
 
       useKeyOrValueAndKey(pointing, 'pointing'),
-      className,
       'dropdown',
+      className,
     )
     const rest = getUnhandledProps(Dropdown, this.props)
     const ElementType = getElementType(Dropdown, this.props)
     const ariaOptions = this.getDropdownAriaOptions(ElementType, this.props)
-
-    let computedTabIndex
-    if (!_.isNil(tabIndex)) {
-      computedTabIndex = tabIndex
-    } else if (!search) {
-      // don't set a root node tabIndex as the search input has its own tabIndex
-      computedTabIndex = disabled ? -1 : 0
-    }
 
     return (
       <ElementType
@@ -1244,10 +1268,9 @@ export default class Dropdown extends Component {
         onMouseDown={this.handleMouseDown}
         onFocus={this.handleFocus}
         onChange={this.handleChange}
-        tabIndex={computedTabIndex}
+        tabIndex={this.computeTabIndex()}
         ref={this.handleRef}
       >
-        {this.renderHiddenInput()}
         {this.renderLabels()}
         {this.renderSearchInput()}
         {this.renderSearchSizer()}

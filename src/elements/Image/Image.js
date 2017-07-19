@@ -1,8 +1,10 @@
 import _ from 'lodash'
 import cx from 'classnames'
-import React, { PropTypes } from 'react'
+import PropTypes from 'prop-types'
+import React from 'react'
 
 import {
+  childrenUtils,
   createShorthandFactory,
   customPropTypes,
   getElementType,
@@ -69,10 +71,10 @@ function Image(props) {
   )
   const rest = getUnhandledProps(Image, props)
   const ElementType = getElementType(Image, props, () => {
-    if (!_.isNil(dimmer) || !_.isNil(label) || !_.isNil(wrapped) || !_.isNil(children)) return 'div'
+    if (!_.isNil(dimmer) || !_.isNil(label) || !_.isNil(wrapped) || !childrenUtils.isNil(children)) return 'div'
   })
 
-  if (!_.isNil(children)) {
+  if (!childrenUtils.isNil(children)) {
     return <ElementType {...rest} className={classes}>{children}</ElementType>
   }
 
@@ -136,8 +138,8 @@ Image.propTypes = {
 
   /** The img element height attribute. */
   height: PropTypes.oneOfType([
-    PropTypes.string,
     PropTypes.number,
+    PropTypes.string,
   ]),
 
   /** An image can be hidden. */

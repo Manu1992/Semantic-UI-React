@@ -1,8 +1,10 @@
 import cx from 'classnames'
 import _ from 'lodash'
-import React, { Component, PropTypes } from 'react'
+import PropTypes from 'prop-types'
+import React, { Component } from 'react'
 
 import {
+  childrenUtils,
   customPropTypes,
   getElementType,
   getUnhandledProps,
@@ -349,8 +351,8 @@ export default class Popup extends Component {
     const popupJSX = (
       <ElementType {...rest} className={classes} style={style} ref={this.handlePopupRef}>
         {children}
-        {_.isNil(children) && PopupHeader.create(header)}
-        {_.isNil(children) && PopupContent.create(content)}
+        {childrenUtils.isNil(children) && PopupHeader.create(header)}
+        {childrenUtils.isNil(children) && PopupContent.create(content)}
       </ElementType>
     )
 

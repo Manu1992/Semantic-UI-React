@@ -1,6 +1,9 @@
 import * as React from 'react';
 
-interface DropdownHeaderProps {
+import { SemanticShorthandContent, SemanticShorthandItem } from '../..';
+import { IconProps } from '../../elements/Icon';
+
+export interface DropdownHeaderProps {
   [key: string]: any;
 
   /** An element type to render as (string or function). */
@@ -13,10 +16,10 @@ interface DropdownHeaderProps {
   className?: string;
 
   /** Shorthand for primary content. */
-  content?: React.ReactNode;
+  content?: SemanticShorthandContent;
 
   /** Shorthand for Icon. */
-  icon?: any;
+  icon?: SemanticShorthandItem<IconProps>;
 }
 
 declare const DropdownHeader: React.ComponentClass<DropdownHeaderProps>;

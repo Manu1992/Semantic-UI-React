@@ -5,6 +5,9 @@ export { default as Radio } from './addons/Radio'
 export { default as Select } from './addons/Select'
 export { default as TextArea } from './addons/TextArea'
 
+// Behaviors
+export { default as Visibility } from './behaviors/Visibility'
+
 // Collections
 export { default as Breadcrumb } from './collections/Breadcrumb'
 export { default as BreadcrumbDivider } from './collections/Breadcrumb/BreadcrumbDivider'
@@ -111,6 +114,7 @@ export { default as DropdownDivider } from './modules/Dropdown/DropdownDivider'
 export { default as DropdownHeader } from './modules/Dropdown/DropdownHeader'
 export { default as DropdownItem } from './modules/Dropdown/DropdownItem'
 export { default as DropdownMenu } from './modules/Dropdown/DropdownMenu'
+export { default as DropdownSearchInput } from './modules/Dropdown/DropdownSearchInput'
 
 export { default as Embed } from './modules/Embed'
 
@@ -137,6 +141,9 @@ export { default as SearchResults } from './modules/Search/SearchResults'
 export { default as Sidebar } from './modules/Sidebar'
 export { default as SidebarPushable } from './modules/Sidebar/SidebarPushable'
 export { default as SidebarPusher } from './modules/Sidebar/SidebarPusher'
+
+export { default as Tab } from './modules/Tab'
+export { default as TabPane } from './modules/Tab/TabPane'
 
 // Views
 export { default as Advertisement } from './views/Advertisement'

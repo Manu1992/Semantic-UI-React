@@ -1,6 +1,9 @@
 import * as React from 'react';
 
-interface MessageListProps {
+import { SemanticShorthandCollection } from '../..';
+import { MessageItemProps } from './MessageItem';
+
+export interface MessageListProps {
   [key: string]: any;
 
   /** An element type to render as (string or function). */
@@ -13,7 +16,7 @@ interface MessageListProps {
   className?: string;
 
   /** Shorthand Message.Items. */
-  items?: Array<any>;
+  items?: SemanticShorthandCollection<MessageItemProps>;
 }
 
 declare const MessageList: React.StatelessComponent<MessageListProps>;

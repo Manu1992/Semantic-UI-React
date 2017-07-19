@@ -1,9 +1,15 @@
 import * as React from 'react';
 
+import {
+  SemanticShorthandCollection,
+  SemanticShorthandContent,
+  SemanticShorthandItem
+} from '../..';
+import { IconProps } from '../../elements/Icon';
 import { default as BreadcrumbDivider } from './BreadcrumbDivider';
-import { default as BreadcrumbSection } from './BreadcrumbSection';
+import { default as BreadcrumbSection, BreadcrumbSectionProps } from './BreadcrumbSection';
 
-interface BreadcrumbProps {
+export interface BreadcrumbProps {
   [key: string]: any;
 
   /** An element type to render as (string or function). */
@@ -16,15 +22,15 @@ interface BreadcrumbProps {
   className?: string;
 
   /** Shorthand for primary content of the Breadcrumb.Divider. */
-  divider?: React.ReactNode;
+  divider?: SemanticShorthandContent;
 
   /** For use with the sections prop. Render as an `Icon` component with `divider` class instead of a `div` in
    *  Breadcrumb.Divider.
    */
-  icon?: any;
+  icon?: SemanticShorthandItem<IconProps>;
 
   /** Shorthand array of props for Breadcrumb.Section. */
-  sections?: Array<any>;
+  sections?: SemanticShorthandCollection<BreadcrumbSectionProps>;
 
   /** Size of Breadcrumb */
   size?:  'mini' | 'tiny' | 'small' | 'large' | 'big' | 'huge' | 'massive';

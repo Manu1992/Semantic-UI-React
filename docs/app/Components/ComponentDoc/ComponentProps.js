@@ -1,12 +1,28 @@
 import _ from 'lodash'
-import React, { Component, PropTypes } from 'react'
+import PropTypes from 'prop-types'
+import React, { Component } from 'react'
 
-import { Icon, Popup, Table } from 'src'
-import { SUI } from 'src/lib'
+import { Header, Icon, Popup, Table } from 'src'
 
-const descriptionExtraStyle = {
-  fontSize: '0.95em',
-  color: '#777',
+const extraDescriptionStyle = {
+  color: '#666',
+}
+const extraDescriptionContentStyle = {
+  marginLeft: '0.5em',
+}
+
+const Extra = ({ title, children, inline, ...rest }) => (
+  <div {...rest} style={extraDescriptionStyle}>
+    <strong>{title}</strong>
+    <div style={{ ...extraDescriptionContentStyle, display: inline ? 'inline' : 'block' }}>
+      {children}
+    </div>
+  </div>
+)
+Extra.propTypes = {
+  children: PropTypes.node,
+  inline: PropTypes.bool,
+  title: PropTypes.node,
 }
 
 const getTagType = tag => tag.type.type === 'AllLiteral' ? 'any' : tag.type.name
@@ -71,91 +87,70 @@ export default class ComponentProps extends Component {
 
     const paramSignature = params
       .map(param => `${param.name}: ${getTagType(param)}`)
+      // prevent object properties from showing as individual params
+      .filter(p => !_.includes(p, '.'))
       .join(', ')
 
-    const tagDescriptions = _.compact([...params, returns]).map(tag => (
-      <div style={{ color: '#888' }} key={tag.name}>
-        <strong>{tag.name || tag.title}</strong> - {tag.description}
-      </div>
-    ))
-
-    const signature = (
-      <pre><code>{item.name}({paramSignature}){returns ? `: ${getTagType(returns)}` : ''}</code></pre>
-    )
+    const tagDescriptionRows = _.compact([...params, returns]).map(tag => {
+      const name = tag.name || tag.title
+      return (
+        <div key={name} style={{ display: 'flex', flexDirection: 'row' }}>
+          <div style={{ flex: '2 2 0', padding: '0.1em 0' }}>
+            <code>{name}</code>
+          </div>
+          <div style={{ flex: '5 5 0', padding: '0.1em 0' }}>
+            {tag.description}
+          </div>
+        </div>
+      )
+    })
 
     return (
-      <div>
-        <strong>Signature:</strong>
-        {signature}
-        {tagDescriptions}
-      </div>
+      <Extra title={<pre>{item.name}({paramSignature}){returns ? `: ${getTagType(returns)}` : ''}</pre>}>
+        {tagDescriptionRows}
+      </Extra>
     )
   }
 
-  expandEnums = (value) => {
-    const parts = value.split('.')
-    if (parts[0] === 'SUI') {
-      return SUI[parts[1]]
-    }
-    return value
-  }
-
-  renderEnums = (item) => {
-    if (item.type !== '{enum}') return
+  renderEnums = ({ name, type, value }) => {
+    if (type !== '{enum}' || !value) return
 
     const { showEnumsFor } = this.state
-    const truncateAt = 30
-
-    if (!item.value) return null
-
-    const values = [].concat(item.value).reduce((accumulator, v) => {
-      return accumulator.concat(this.expandEnums(_.trim(v.value || v, '.\'')))
-    }, [])
+    const truncateAt = 10
+    const valueElements = _.map(value, val => <span key={val}><code>{val}</code> </span>)
 
     // show all if there are few
-    if (values.length < truncateAt) {
-      return (
-        <p style={descriptionExtraStyle}>
-          <strong>Enums: </strong> {values.join(', ')}
-        </p>
-      )
-    }
+    if (value.length < truncateAt) return <Extra title='Enums:' inline>{valueElements}</Extra>
 
     // add button to show more when there are many values and it is not toggled
-    if (!showEnumsFor[item.name]) {
+    if (!showEnumsFor[name]) {
       return (
-        <p style={descriptionExtraStyle}>
-          <strong>Enums: </strong>
-          <a style={{ cursor: 'pointer' }} onClick={this.toggleEnumsFor(item.name)}>
-            Show all {values.length}
+        <Extra title='Enums:' inline>
+          <a style={{ cursor: 'pointer' }} onClick={this.toggleEnumsFor(name)}>
+            Show all {value.length}
           </a>
-          <div>{values.slice(0, truncateAt - 1).join(', ')}...</div>
-        </p>
+          <div>{valueElements.slice(0, truncateAt - 1)}...</div>
+        </Extra>
       )
     }
 
     // add "show more" button when there are many
     return (
-      <p style={descriptionExtraStyle}>
-        <strong>Enums: </strong>
-        <a style={{ cursor: 'pointer' }} onClick={this.toggleEnumsFor(item.name)}>
-          Show less
-        </a>
-        <div>{values.join(', ')}</div>
-      </p>
+      <Extra title='Enums:' inline>
+        <a style={{ cursor: 'pointer' }} onClick={this.toggleEnumsFor(name)}>Show less</a>
+        <div>{valueElements}</div>
+      </Extra>
     )
   }
 
   renderRow = item => {
     return (
       <Table.Row key={item.name}>
-        <Table.Cell>{this.renderName(item)}{this.renderRequired(item)}</Table.Cell>
-        <Table.Cell>{this.renderDefaultValue(item)}</Table.Cell>
-        <Table.Cell>{item.type}</Table.Cell>
+        <Table.Cell collapsing>{this.renderName(item)}{this.renderRequired(item)}</Table.Cell>
+        <Table.Cell collapsing>{this.renderDefaultValue(item)}</Table.Cell>
+        <Table.Cell collapsing>{item.type}</Table.Cell>
         <Table.Cell>
-          {item.description && (
-            <p>{item.description}</p>
-          )}
+          {item.description && <p>{item.description}</p>}
           {this.renderFunctionSignature(item)}
           {this.renderEnums(item)}
         </Table.Cell>
@@ -188,7 +183,7 @@ export default class ComponentProps extends Component {
     }), 'name')
 
     return (
-      <Table compact basic='very'>
+      <Table compact='very' basic='very'>
         <Table.Header>
           <Table.Row>
             <Table.HeaderCell>Name</Table.HeaderCell>

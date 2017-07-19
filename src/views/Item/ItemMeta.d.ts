@@ -1,6 +1,7 @@
 import * as React from 'react';
+import { SemanticShorthandContent } from '../..';
 
-interface ItemMetaProps {
+export interface ItemMetaProps {
   [key: string]: any;
 
   /** An element type to render as (string or function). */
@@ -13,7 +14,7 @@ interface ItemMetaProps {
   className?: string;
 
   /** Shorthand for primary content. */
-  content?: React.ReactNode;
+  content?: SemanticShorthandContent;
 }
 
 declare const ItemMeta: React.StatelessComponent<ItemMetaProps>;

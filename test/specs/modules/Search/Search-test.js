@@ -2,12 +2,13 @@ import _ from 'lodash'
 import faker from 'faker'
 import React from 'react'
 
-import * as common from 'test/specs/commonTests'
-import { domEvent, sandbox } from 'test/utils'
-import Search from 'src/modules/Search/Search'
+import { htmlInputAttrs } from 'src/lib'
+import Search from 'src/modules/Search'
 import SearchCategory from 'src/modules/Search/SearchCategory'
 import SearchResult from 'src/modules/Search/SearchResult'
 import SearchResults from 'src/modules/Search/SearchResults'
+import * as common from 'test/specs/commonTests'
+import { domEvent, sandbox } from 'test/utils'
 
 let attachTo
 let options
@@ -76,8 +77,9 @@ describe('Search', () => {
   })
 
   common.isConformant(Search)
-  common.hasUIClassName(Search)
   common.hasSubComponents(Search, [SearchCategory, SearchResult, SearchResults])
+  common.hasUIClassName(Search)
+
   common.propKeyOnlyToClassName(Search, 'category')
   common.propKeyOnlyToClassName(Search, 'fluid')
   common.propKeyOnlyToClassName(Search, 'loading')
@@ -544,7 +546,11 @@ describe('Search', () => {
         .simulate('click', nativeEvent)
 
       spy.should.have.been.calledOnce()
-      spy.should.have.been.calledWithMatch({}, randomResult)
+      spy.should.have.been.calledWithMatch({}, {
+        minCharacters: 0,
+        result: randomResult,
+        results: options,
+      })
     })
     it('is called with event and value when pressing enter on a selected item', () => {
       const firstResult = options[0]
@@ -557,7 +563,7 @@ describe('Search', () => {
       domEvent.keyDown(document, { key: 'Enter' })
 
       spy.should.have.been.calledOnce()
-      spy.should.have.been.calledWithMatch({}, firstResult)
+      spy.should.have.been.calledWithMatch({}, { result: firstResult })
     })
     it('is not called when updating the value prop', () => {
       const value = _.sample(options).title
@@ -589,7 +595,11 @@ describe('Search', () => {
         .simulate('change', { target: { value: 'a' }, stopPropagation: _.noop })
 
       spy.should.have.been.calledOnce()
-      spy.should.have.been.calledWithMatch({ target: { value: 'a' } }, 'a')
+      spy.should.have.been.calledWithMatch({ target: { value: 'a' } }, {
+        minCharacters: 0,
+        results: options,
+        value: 'a',
+      })
     })
   })
 
@@ -694,12 +704,19 @@ describe('Search', () => {
         .find('.message.empty .header')
         .should.have.text('No results found.')
     })
-    it('uses custom noResultsMessage', () => {
+    it('uses custom string for noResultsMessage', () => {
       wrapperMount(<Search results={[]} minCharacters={0} noResultsMessage='Something custom' />)
 
       wrapper
         .find('.message.empty .header')
         .should.have.text('Something custom')
+    })
+    it('uses custom component for noResultsMessage', () => {
+      wrapperMount(<Search results={[]} minCharacters={0} noResultsMessage={<span>Test</span>} />)
+
+      wrapper
+        .find('.message.empty .header')
+        .should.contain.descendants('span')
     })
     it('uses custom noResultsDescription if present', () => {
       wrapperMount(<Search results={[]} minCharacters={0} noResultsDescription='Something custom' />)
@@ -728,18 +745,16 @@ describe('Search', () => {
     })
   })
 
-  describe('placeholder', () => {
-    it('is present when defined', () => {
-      wrapperShallow(<Search results={options} minCharacters={0} placeholder='hi' />)
-        .find('Input')
-        .first()
-        .should.have.prop('placeholder', 'hi')
-    })
-    it('is not present when not defined', () => {
-      wrapperShallow(<Search results={options} minCharacters={0} />)
-        .find('Input')
-        .first()
-        .should.not.have.prop('placeholder')
+  describe('input props', () => {
+    // Search handles some of html props
+    const props = _.without(htmlInputAttrs, 'defaultValue')
+
+    props.forEach(propName => {
+      it(`passes "${propName}" to the <input>`, () => {
+        wrapperMount(<Search {...{ [propName]: 'foo' }} />)
+          .find('input')
+          .should.have.prop(propName)
+      })
     })
   })
 })

@@ -1,8 +1,10 @@
 import cx from 'classnames'
 import _ from 'lodash'
-import React, { PropTypes } from 'react'
+import PropTypes from 'prop-types'
+import React from 'react'
 
 import {
+  childrenUtils,
   customPropTypes,
   getElementType,
   getUnhandledProps,
@@ -45,7 +47,7 @@ function Statistic(props) {
   const rest = getUnhandledProps(Statistic, props)
   const ElementType = getElementType(Statistic, props)
 
-  if (!_.isNil(children)) return <ElementType {...rest} className={classes}>{children}</ElementType>
+  if (!childrenUtils.isNil(children)) return <ElementType {...rest} className={classes}>{children}</ElementType>
 
   return (
     <ElementType {...rest} className={classes}>

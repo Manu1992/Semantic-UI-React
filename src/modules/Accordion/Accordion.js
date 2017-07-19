@@ -1,6 +1,7 @@
-import _ from 'lodash'
 import cx from 'classnames'
-import React, { Children, cloneElement, PropTypes } from 'react'
+import _ from 'lodash'
+import PropTypes from 'prop-types'
+import React, { Children, cloneElement } from 'react'
 
 import {
   AutoControlledComponent as Component,
@@ -94,13 +95,8 @@ export default class Accordion extends Component {
   static Content = AccordionContent
   static Title = AccordionTitle
 
-  state = {}
-
-  constructor(...args) {
-    super(...args)
-    this.state = {
-      activeIndex: this.props.exclusive ? -1 : [-1],
-    }
+  getInitialAutoControlledState({ exclusive }) {
+    return { activeIndex: exclusive ? -1 : [-1] }
   }
 
   handleTitleClick = (e, index) => {

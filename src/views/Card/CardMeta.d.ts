@@ -1,6 +1,7 @@
 import * as React from 'react';
+import { SemanticShorthandContent } from '../..';
 
-interface CardMetaProps {
+export interface CardMetaProps {
   [key: string]: any;
 
   /** An element type to render as (string or function). */
@@ -13,7 +14,7 @@ interface CardMetaProps {
   className?: string;
 
   /** Shorthand for primary content. */
-  content?: React.ReactNode;
+  content?: SemanticShorthandContent;
 }
 
 declare const CardMeta: React.StatelessComponent<CardMetaProps>;

@@ -1,6 +1,7 @@
 import * as React from 'react';
+import { SemanticShorthandContent } from '../..';
 
-interface AccordionContentProps {
+export interface AccordionContentProps {
   [key: string]: any;
 
   /** An element type to render as (string or function). */
@@ -14,6 +15,9 @@ interface AccordionContentProps {
 
   /** Additional classes. */
   className?: string;
+
+  /** Shorthand for primary content. */
+  content?: SemanticShorthandContent;
 }
 
 declare const AccordionContent: React.StatelessComponent<AccordionContentProps>;

@@ -1,6 +1,7 @@
 import * as React from 'react';
+import { SemanticShorthandContent } from '../..';
 
-interface MenuHeaderProps {
+export interface MenuHeaderProps {
   [key: string]: any;
 
   /** An element type to render as (string or function). */
@@ -13,7 +14,7 @@ interface MenuHeaderProps {
   className?: string;
 
   /** Shorthand for primary content. */
-  content?: React.ReactNode;
+  content?: SemanticShorthandContent;
 }
 
 declare const MenuHeader: React.ComponentClass<MenuHeaderProps>;

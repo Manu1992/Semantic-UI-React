@@ -1,8 +1,10 @@
 import cx from 'classnames'
 import _ from 'lodash'
-import React, { Component, PropTypes } from 'react'
+import PropTypes from 'prop-types'
+import React, { Component } from 'react'
 
 import {
+  childrenUtils,
   createShorthandFactory,
   customPropTypes,
   getElementType,
@@ -73,8 +75,8 @@ export default class MenuItem extends Component {
      */
     onClick: PropTypes.func,
 
-    /** A menu item can take right position. */
-    position: PropTypes.oneOf(['right']),
+    /** A menu item can take left or right position. */
+    position: PropTypes.oneOf(['left', 'right']),
   }
 
   static _meta = {
@@ -123,7 +125,7 @@ export default class MenuItem extends Component {
     })
     const rest = getUnhandledProps(MenuItem, this.props)
 
-    if (!_.isNil(children)) {
+    if (!childrenUtils.isNil(children)) {
       return <ElementType {...rest} className={classes} onClick={this.handleClick}>{children}</ElementType>
     }
 
@@ -136,4 +138,4 @@ export default class MenuItem extends Component {
   }
 }
 
-MenuItem.create = createShorthandFactory(MenuItem, val => ({ content: val, name: val }), true)
+MenuItem.create = createShorthandFactory(MenuItem, val => ({ content: val, name: val }))

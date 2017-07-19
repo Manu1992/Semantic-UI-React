@@ -1,8 +1,9 @@
-import _ from 'lodash'
 import cx from 'classnames'
-import React, { PropTypes } from 'react'
+import PropTypes from 'prop-types'
+import React from 'react'
 
 import {
+  childrenUtils,
   customPropTypes,
   getElementType,
   getUnhandledProps,
@@ -17,7 +18,7 @@ function StepDescription(props) {
 
   return (
     <ElementType {...rest} className={classes}>
-      {_.isNil(children) ? description : children}
+      {childrenUtils.isNil(children) ? description : children}
     </ElementType>
   )
 }
@@ -32,11 +33,11 @@ StepDescription.propTypes = {
   /** An element type to render as (string or function). */
   as: customPropTypes.as,
 
-  /** Additional classes. */
-  className: PropTypes.string,
-
   /** Primary content. */
   children: PropTypes.node,
+
+  /** Additional classes. */
+  className: PropTypes.string,
 
   /** Shorthand for primary content. */
   description: customPropTypes.contentShorthand,

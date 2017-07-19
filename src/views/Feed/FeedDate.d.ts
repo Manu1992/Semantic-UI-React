@@ -1,6 +1,7 @@
 import * as React from 'react';
+import { SemanticShorthandContent } from '../..';
 
-interface FeedDateProps {
+export interface FeedDateProps {
   [key: string]: any;
 
   /** An element type to render as (string or function). */
@@ -13,7 +14,7 @@ interface FeedDateProps {
   className?: string;
 
   /** Shorthand for primary content. */
-  content?: any;
+  content?: SemanticShorthandContent;
 }
 
 declare const FeedDate: React.StatelessComponent<FeedDateProps>;

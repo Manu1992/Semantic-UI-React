@@ -1,7 +1,9 @@
 import * as React from 'react';
-import { SemanticVERTICALALIGNMENTS } from '../..';
 
-interface TableRowProps {
+import { SemanticShorthandCollection, SemanticVERTICALALIGNMENTS } from '../..';
+import { TableCellProps } from './TableCell';
+
+export interface TableRowProps {
   [key: string]: any;
 
   /** An element type to render as (string or function). */
@@ -14,7 +16,7 @@ interface TableRowProps {
   cellAs?: any;
 
   /** Shorthand array of props for TableCell. */
-  cells?: any;
+  cells?: SemanticShorthandCollection<TableCellProps>;
 
   /** Primary content. */
   children?: React.ReactNode;

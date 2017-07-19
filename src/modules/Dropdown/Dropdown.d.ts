@@ -1,10 +1,11 @@
 import * as React from 'react';
 
-import { LabelProps } from '../../elements/Label/Label';
+import { LabelProps } from '../../elements/Label';
 import { default as DropdownDivider } from './DropdownDivider';
 import { default as DropdownHeader } from './DropdownHeader';
 import { default as DropdownItem, DropdownItemProps } from './DropdownItem';
 import { default as DropdownMenu } from './DropdownMenu';
+import { default as DropdownSearchInput } from './DropdownSearchInput';
 
 export interface DropdownProps {
   [key: string]: any;
@@ -56,7 +57,7 @@ export interface DropdownProps {
   defaultSelectedLabel?: number | string;
 
   /** Initial value or value array if multiple. */
-  defaultValue?: string | number | Array<number | string >;
+  defaultValue?: string | number | Array<number | string>;
 
   /** A disabled dropdown menu or item does not allow user interaction. */
   disabled?: boolean;
@@ -88,11 +89,11 @@ export interface DropdownProps {
   /** A dropdown can show that it is currently loading data. */
   loading?: boolean;
 
+  /** The minimum characters for a search to begin showing results. */
+  minCharacters?: number;
+
   /** A selection dropdown can allow multiple selections. */
   multiple?: boolean;
-
-  /** Name of the hidden input which holds the value. */
-  name?: string;
 
   /** Message to display when there are no results. */
   noResultsMessage?: string;
@@ -201,7 +202,7 @@ export interface DropdownProps {
    * @param {object} defaultLabelProps - The default props for an active item Label.
    * @returns {*} Shorthand for a Label.
    */
-  renderLabel?: (item: DropdownItemProps, index: number, defaultLabelProps: LabelProps) => React.ReactElement<any>;
+  renderLabel?: (item: DropdownItemProps, index: number, defaultLabelProps: LabelProps) => any;
 
   /** A dropdown can have its menu scroll. */
   scrolling?: boolean;
@@ -212,8 +213,14 @@ export interface DropdownProps {
    */
   search?: boolean | ((options: Array<DropdownItemProps>, value: string) => Array<DropdownItemProps>);
 
+  /** A shorthand for a search input. */
+  searchInput?: any;
+
   /** Define whether the highlighted item should be selected on blur. */
   selectOnBlur?: boolean;
+
+  /** Currently selected label in multi-select. */
+  selectedLabel?: number | string;
 
   /** A dropdown can be used to select between choices in a form. */
   selection?: any;
@@ -225,13 +232,16 @@ export interface DropdownProps {
   tabIndex?: number | string;
 
   /** The text displayed in the dropdown, usually for the active item. */
-  text?: string|React.ReactNode;
+  text?: string;
 
   /** Custom element to trigger the menu to become visible. Takes place of 'text'. */
   trigger?: React.ReactNode;
 
   /** Current value or value array if multiple. Creates a controlled component. */
   value?: number | string | Array<number | string>;
+
+  /** A dropdown can open upward. */
+  upward?: boolean;
 }
 
 interface DropdownComponent extends React.ComponentClass<DropdownProps> {
@@ -239,6 +249,7 @@ interface DropdownComponent extends React.ComponentClass<DropdownProps> {
   Header: typeof DropdownHeader;
   Item: typeof DropdownItem;
   Menu: typeof DropdownMenu;
+  SearchInput: typeof DropdownSearchInput;
 }
 
 declare const Dropdown: DropdownComponent;

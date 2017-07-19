@@ -1,6 +1,7 @@
 import * as React from 'react';
+import { SemanticShorthandContent } from '../..';
 
-interface StepDescriptionProps {
+export interface StepDescriptionProps {
   [key: string]: any;
 
   /** An element type to render as (string or function). */
@@ -13,7 +14,7 @@ interface StepDescriptionProps {
   className?: string;
 
   /** Shorthand for primary content. */
-  description?: React.ReactNode;
+  description?: SemanticShorthandContent;
 }
 
 declare const StepDescription: React.StatelessComponent<StepDescriptionProps>;

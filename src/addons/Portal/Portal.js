@@ -1,5 +1,6 @@
 import _ from 'lodash'
-import { Children, cloneElement, PropTypes } from 'react'
+import PropTypes from 'prop-types'
+import { Children, cloneElement } from 'react'
 import ReactDOM from 'react-dom'
 
 import {
@@ -15,6 +16,9 @@ const debug = makeDebugger('portal')
 /**
  * A component that allows you to render children outside their parent.
  * @see Modal
+ * @see Popup
+ * @see Dimmer
+ * @see Confirm
  */
 class Portal extends Component {
   static propTypes = {
@@ -60,11 +64,11 @@ class Portal extends Component {
     /** The node where the portal should mount. */
     mountNode: PropTypes.any,
 
-    /** Milliseconds to wait before closing on mouse leave */
-    mouseLeaveDelay: PropTypes.number,
-
     /** Milliseconds to wait before opening on mouse over */
     mouseEnterDelay: PropTypes.number,
+
+    /** Milliseconds to wait before closing on mouse leave */
+    mouseLeaveDelay: PropTypes.number,
 
     /**
      * Called when a close event happens
@@ -131,8 +135,6 @@ class Portal extends Component {
     name: 'Portal',
     type: META.TYPES.ADDON,
   }
-
-  state = {}
 
   componentDidMount() {
     debug('componentDidMount()')
@@ -353,13 +355,14 @@ class Portal extends Component {
     ReactDOM.unstable_renderSubtreeIntoContainer(
       this,
       Children.only(children),
-      this.rootNode
+      this.rootNode,
+      () => {
+        this.portalNode = this.rootNode.firstElementChild
+
+        this.portalNode.addEventListener('mouseleave', this.handlePortalMouseLeave)
+        this.portalNode.addEventListener('mouseenter', this.handlePortalMouseEnter)
+      }
     )
-
-    this.portalNode = this.rootNode.firstElementChild
-
-    this.portalNode.addEventListener('mouseleave', this.handlePortalMouseLeave)
-    this.portalNode.addEventListener('mouseenter', this.handlePortalMouseEnter)
   }
 
   mountPortal = () => {

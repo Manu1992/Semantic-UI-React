@@ -1,6 +1,9 @@
 import * as React from 'react';
 
-interface EmbedProps {
+import { SemanticShorthandItem } from '../..';
+import { IconProps } from '../../elements/Icon';
+
+export interface EmbedProps {
   [key: string]: any;
 
   /** An element type to render as (string or function). */
@@ -34,7 +37,7 @@ interface EmbedProps {
   hd?: boolean;
 
   /** Specifies an icon to use with placeholder content. */
-  icon?: any;
+  icon?: SemanticShorthandItem<IconProps>;
 
   /** Specifies an id for source. */
   id?: string;

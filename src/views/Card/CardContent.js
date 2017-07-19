@@ -1,8 +1,9 @@
 import cx from 'classnames'
-import _ from 'lodash'
-import React, { PropTypes } from 'react'
+import PropTypes from 'prop-types'
+import React from 'react'
 
 import {
+  childrenUtils,
   createShorthand,
   customPropTypes,
   getElementType,
@@ -35,7 +36,7 @@ function CardContent(props) {
   const rest = getUnhandledProps(CardContent, props)
   const ElementType = getElementType(CardContent, props)
 
-  if (!_.isNil(children)) {
+  if (!childrenUtils.isNil(children)) {
     return <ElementType {...rest} className={classes}>{children}</ElementType>
   }
 

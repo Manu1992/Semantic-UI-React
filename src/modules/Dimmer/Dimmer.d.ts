@@ -1,7 +1,9 @@
 import * as React from 'react';
+
+import { SemanticShorthandContent } from '../..';
 import DimmerDimmable from './DimmerDimmable';
 
-interface DimmerProps {
+export interface DimmerProps {
   [key: string]: any;
 
   /** An element type to render as (string or function). */
@@ -17,7 +19,7 @@ interface DimmerProps {
   className?: string;
 
   /** Shorthand for primary content. */
-  content?: React.ReactNode;
+  content?: SemanticShorthandContent;
 
   /** A disabled dimmer cannot be activated */
   disabled?: boolean;

@@ -1,6 +1,11 @@
 import * as React from 'react';
 
-interface CardContentProps {
+import { SemanticShorthandItem } from '../..';
+import { CardDescriptionProps } from './CardDescription';
+import { CardHeaderProps } from './CardHeader';
+import { CardMetaProps } from './CardMeta';
+
+export interface CardContentProps {
   [key: string]: any;
 
   /** An element type to render as (string or function). */
@@ -13,16 +18,16 @@ interface CardContentProps {
   className?: string;
 
   /** Shorthand for CardDescription. */
-  description?: string;
+  description?: SemanticShorthandItem<CardDescriptionProps>;
 
   /** A card can contain extra content meant to be formatted separately from the main content. */
   extra?: boolean;
 
   /** Shorthand for CardHeader. */
-  header?: any;
+  header?: SemanticShorthandItem<CardHeaderProps>;
 
   /** Shorthand for CardMeta. */
-  meta?: any;
+  meta?: SemanticShorthandItem<CardMetaProps>;
 }
 
 declare const CardContent: React.StatelessComponent<CardContentProps>;

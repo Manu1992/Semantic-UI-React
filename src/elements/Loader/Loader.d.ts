@@ -1,7 +1,7 @@
 import * as React from 'react';
-import { SemanticSIZES } from '../..';
+import { SemanticShorthandContent, SemanticSIZES } from '../..';
 
-interface LoaderProps {
+export interface LoaderProps {
   [key: string]: any;
 
   /** An element type to render as (string or function). */
@@ -17,7 +17,7 @@ interface LoaderProps {
   className?: string;
 
   /** Shorthand for primary content. */
-  content?: any;
+  content?: SemanticShorthandContent;
 
   /** A loader can be disabled or hidden. */
   disabled?: boolean;

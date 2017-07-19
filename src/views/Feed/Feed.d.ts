@@ -1,8 +1,9 @@
 import * as React from 'react';
 
+import { SemanticShorthandCollection } from '../..';
 import { default as FeedContent } from './FeedContent';
 import { default as FeedDate } from './FeedDate';
-import { default as FeedEvent } from './FeedEvent';
+import { default as FeedEvent, FeedEventProps } from './FeedEvent';
 import { default as FeedExtra } from './FeedExtra';
 import { default as FeedLabel } from './FeedLabel';
 import { default as FeedMeta } from './FeedMeta';
@@ -10,7 +11,7 @@ import { default as FeedLike } from './FeedLike';
 import { default as FeedSummary } from './FeedSummary';
 import { default as FeedUser } from './FeedUser';
 
-interface FeedProps {
+export interface FeedProps {
   [key: string]: any;
 
   /** An element type to render as (string or function). */
@@ -23,7 +24,7 @@ interface FeedProps {
   className?: string;
 
   /** Shorthand array of props for FeedEvent. */
-  events?: Array<any>;
+  events?: SemanticShorthandCollection<FeedEventProps>;
 
   /** A feed can have different sizes. */
   size?: 'small' | 'large';

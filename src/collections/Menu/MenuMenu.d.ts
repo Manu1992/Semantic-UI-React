@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-interface MenuMenuProps {
+export interface MenuMenuProps {
   [key: string]: any;
 
   /** An element type to render as (string or function). */
@@ -12,8 +12,8 @@ interface MenuMenuProps {
   /** Additional classes. */
   className?: string;
 
-  /** A sub menu can take right position. */
-  position?: 'right';
+  /** A sub menu can take left or right position. */
+  position?: 'left' | 'right';
 }
 
 declare const MenuMenu: React.StatelessComponent<MenuMenuProps>;

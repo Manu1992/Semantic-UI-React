@@ -1,6 +1,7 @@
 import * as React from 'react';
+import { SemanticShorthandContent } from '../..';
 
-interface StatisticValueProps {
+export interface StatisticValueProps {
   [key: string]: any;
 
   /** An element type to render as (string or function). */
@@ -16,7 +17,7 @@ interface StatisticValueProps {
   text?: boolean;
 
   /** Primary content of the StatisticValue. Mutually exclusive with the children prop. */
-  value?: React.ReactNode;
+  value?: SemanticShorthandContent;
 }
 
 declare const StatisticValue: React.StatelessComponent<StatisticValueProps>;

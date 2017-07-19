@@ -1,7 +1,9 @@
 import * as React from 'react';
-import { SemanticWIDTHS } from '../..';
 
-interface CardGroupProps {
+import { SemanticShorthandCollection, SemanticWIDTHS } from '../..';
+import { CardProps } from './Card';
+
+export interface CardGroupProps {
   [key: string]: any;
 
   /** An element type to render as (string or function). */
@@ -17,7 +19,7 @@ interface CardGroupProps {
   doubling?: boolean;
 
   /** Shorthand array of props for Card. */
-  items?: Array<any>;
+  items?: SemanticShorthandCollection<CardProps>;
 
   /** A group of cards can set how many cards should exist in a row. */
   itemsPerRow?: SemanticWIDTHS;

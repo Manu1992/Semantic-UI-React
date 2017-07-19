@@ -1,6 +1,9 @@
 import * as React from 'react';
 
-interface FeedLikeProps {
+import { SemanticShorthandContent, SemanticShorthandItem } from '../..';
+import { IconProps } from '../../elements/Icon';
+
+export interface FeedLikeProps {
   [key: string]: any;
 
   /** An element type to render as (string or function). */
@@ -13,10 +16,10 @@ interface FeedLikeProps {
   className?: string;
 
   /** Shorthand for primary content. */
-  content?: React.ReactNode;
+  content?: SemanticShorthandContent;
 
   /** Shorthand for icon. Mutually exclusive with children. */
-  icon?: any;
+  icon?: SemanticShorthandItem<IconProps>;
 }
 
 declare const FeedLike: React.StatelessComponent<FeedLikeProps>;

@@ -1,8 +1,9 @@
 import cx from 'classnames'
-import _ from 'lodash'
-import React, { Component, PropTypes } from 'react'
+import PropTypes from 'prop-types'
+import React, { Component } from 'react'
 
 import {
+  childrenUtils,
   createShorthandFactory,
   customPropTypes,
   getUnhandledProps,
@@ -88,10 +89,10 @@ export default class BreadcrumbSection extends Component {
 
     return (
       <ElementType {...rest} className={classes} href={href} onClick={this.handleClick}>
-        {_.isNil(children) ? content : children}
+        {childrenUtils.isNil(children) ? content : children}
       </ElementType>
     )
   }
 }
 
-BreadcrumbSection.create = createShorthandFactory(BreadcrumbSection, content => ({ content, link: true }), true)
+BreadcrumbSection.create = createShorthandFactory(BreadcrumbSection, content => ({ content, link: true }))

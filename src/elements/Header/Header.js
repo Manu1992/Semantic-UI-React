@@ -1,8 +1,10 @@
 import _ from 'lodash'
 import cx from 'classnames'
-import React, { PropTypes } from 'react'
+import PropTypes from 'prop-types'
+import React from 'react'
 
 import {
+  childrenUtils,
   customPropTypes,
   getElementType,
   getUnhandledProps,
@@ -62,7 +64,7 @@ function Header(props) {
   const rest = getUnhandledProps(Header, props)
   const ElementType = getElementType(Header, props)
 
-  if (!_.isNil(children)) {
+  if (!childrenUtils.isNil(children)) {
     return <ElementType {...rest} className={classes}>{children}</ElementType>
   }
 

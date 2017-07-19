@@ -1,9 +1,11 @@
 import cx from 'classnames'
 import _ from 'lodash'
-import React, { PropTypes } from 'react'
+import PropTypes from 'prop-types'
+import React from 'react'
 
 import {
   AutoControlledComponent as Component,
+  childrenUtils,
   customPropTypes,
   getElementType,
   getUnhandledProps,
@@ -31,6 +33,9 @@ class Modal extends Component {
     /** An element type to render as (string or function). */
     as: customPropTypes.as,
 
+    /** Elements to render as Modal action buttons. */
+    actions: PropTypes.arrayOf(customPropTypes.itemShorthand),
+
     /** A modal can reduce its complexity */
     basic: PropTypes.bool,
 
@@ -53,14 +58,20 @@ class Modal extends Component {
     /** Whether or not the Modal should close when the document is clicked. */
     closeOnDocumentClick: PropTypes.bool,
 
+    /** Simple text content for the Modal. */
+    content: customPropTypes.itemShorthand,
+
     /** Initial value of open. */
     defaultOpen: PropTypes.bool,
 
-    /** A modal can appear in a dimmer. */
+    /** A Modal can appear in a dimmer. */
     dimmer: PropTypes.oneOfType([
       PropTypes.bool,
       PropTypes.oneOf(['inverted', 'blurring']),
     ]),
+
+    /** Modal displayed above the content in bold. */
+    header: customPropTypes.itemShorthand,
 
     /** The node where the modal should mount. Defaults to document.body. */
     mountNode: PropTypes.any,
@@ -101,7 +112,10 @@ class Modal extends Component {
     open: PropTypes.bool,
 
     /** A modal can vary in size */
-    size: PropTypes.oneOf(['fullscreen', 'large', 'small']),
+    size: PropTypes.oneOf(['fullscreen', 'large', 'mini', 'small', 'tiny']),
+
+    /** Custom styles. */
+    style: PropTypes.object,
 
     /**
      * NOTE: Any unhandled props that are defined in Portal are passed-through
@@ -129,8 +143,6 @@ class Modal extends Component {
   static Description = ModalDescription
   static Actions = ModalActions
 
-  state = {}
-
   componentWillUnmount() {
     debug('componentWillUnmount()')
     this.handlePortalUnmount()
@@ -138,6 +150,15 @@ class Modal extends Component {
 
   // Do not access document when server side rendering
   getMountNode = () => isBrowser ? this.props.mountNode || document.body : null
+
+  handleActionsOverrides = predefinedProps => ({
+    onActionClick: (e, actionProps) => {
+      const { triggerClose } = actionProps
+
+      _.invoke(predefinedProps, 'onActionClick', e, actionProps)
+      if (triggerClose) this.handleClose(e)
+    },
+  })
 
   handleClose = (e) => {
     debug('close()')
@@ -147,6 +168,13 @@ class Modal extends Component {
 
     this.trySetState({ open: false })
   }
+
+  handleIconOverrides = predefinedProps => ({
+    onClick: e => {
+      _.invoke(predefinedProps, 'onClick', e)
+      this.handleClose(e)
+    },
+  })
 
   handleOpen = (e) => {
     debug('open()')
@@ -164,7 +192,8 @@ class Modal extends Component {
 
     if (dimmer) {
       debug('adding dimmer')
-      mountNode.classList.add('dimmable', 'dimmed')
+      mountNode.classList.add('dimmable')
+      mountNode.classList.add('dimmed')
 
       if (dimmer === 'blurring') {
         debug('adding blurred dimmer')
@@ -185,7 +214,12 @@ class Modal extends Component {
     // If the dimmer value changes while the modal is open, then removing its
     // current value could leave cruft classes previously added.
     const mountNode = this.getMountNode()
-    mountNode.classList.remove('blurring', 'dimmable', 'dimmed', 'scrollable')
+
+    // Heads up, IE doesn't support second argument in remove()
+    mountNode.classList.remove('blurring')
+    mountNode.classList.remove('dimmable')
+    mountNode.classList.remove('dimmed')
+    mountNode.classList.remove('scrollable')
 
     cancelAnimationFrame(this.animationRequestId)
 
@@ -225,25 +259,20 @@ class Modal extends Component {
     this.animationRequestId = requestAnimationFrame(this.setPosition)
   }
 
-  render() {
-    const { open } = this.state
+  renderContent = rest => {
     const {
+      actions,
       basic,
       children,
       className,
       closeIcon,
-      closeOnDimmerClick,
-      closeOnDocumentClick,
-      dimmer,
+      content,
+      header,
       size,
+      style,
     } = this.props
-
-    const mountNode = this.getMountNode()
-
-    // Short circuit when server side rendering
-    if (!isBrowser) return null
-
     const { marginTop, scrolling } = this.state
+
     const classes = cx(
       'ui',
       size,
@@ -252,21 +281,43 @@ class Modal extends Component {
       'modal transition visible active',
       className,
     )
+    const ElementType = getElementType(Modal, this.props)
+
+    const closeIconName = closeIcon === true ? 'close' : closeIcon
+    const closeIconJSX = Icon.create(closeIconName, { overrideProps: this.handleIconOverrides })
+
+    if (!childrenUtils.isNil(children)) {
+      return (
+        <ElementType {...rest} className={classes} style={{ marginTop, ...style }} ref={this.handleRef}>
+          {closeIconJSX}
+          {children}
+        </ElementType>
+      )
+    }
+
+    return (
+      <ElementType {...rest} className={classes} style={{ marginTop, ...style }} ref={this.handleRef}>
+        {closeIconJSX}
+        {ModalHeader.create(header)}
+        {ModalContent.create(content)}
+        {ModalActions.create(actions, { overrideProps: this.handleActionsOverrides })}
+      </ElementType>
+    )
+  }
+
+  render() {
+    const { open } = this.state
+    const { closeOnDimmerClick, closeOnDocumentClick, dimmer } = this.props
+    const mountNode = this.getMountNode()
+
+    // Short circuit when server side rendering
+    if (!isBrowser) return null
+
     const unhandled = getUnhandledProps(Modal, this.props)
     const portalPropNames = Portal.handledProps
 
     const rest = _.omit(unhandled, portalPropNames)
     const portalProps = _.pick(unhandled, portalPropNames)
-    const ElementType = getElementType(Modal, this.props)
-
-    const closeIconName = closeIcon === true ? 'close' : closeIcon
-
-    const modalJSX = (
-      <ElementType {...rest} className={classes} style={{ marginTop }} ref={this.handleRef}>
-        {Icon.create(closeIconName, { onClick: this.handleClose })}
-        {children}
-      </ElementType>
-    )
 
     // wrap dimmer modals
     const dimmerClasses = !dimmer
@@ -290,18 +341,18 @@ class Modal extends Component {
 
     return (
       <Portal
-        closeOnRootNodeClick={closeOnDimmerClick}
         closeOnDocumentClick={closeOnDocumentClick}
+        closeOnRootNodeClick={closeOnDimmerClick}
         {...portalProps}
         className={dimmerClasses}
         mountNode={mountNode}
+        open={open}
         onClose={this.handleClose}
         onMount={this.handlePortalMount}
         onOpen={this.handleOpen}
         onUnmount={this.handlePortalUnmount}
-        open={open}
       >
-        {modalJSX}
+        {this.renderContent(rest)}
       </Portal>
     )
   }

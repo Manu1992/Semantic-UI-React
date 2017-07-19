@@ -1,17 +1,20 @@
-import _ from 'lodash'
 import cx from 'classnames'
-import React, { PropTypes } from 'react'
+import _ from 'lodash'
+import PropTypes from 'prop-types'
+import React from 'react'
 
 import {
   AutoControlledComponent as Component,
   customPropTypes,
   getElementType,
   getUnhandledProps,
+  htmlInputAttrs,
   isBrowser,
   keyboardKey,
   makeDebugger,
   META,
   objectDiff,
+  partitionHTMLInputProps,
   SUI,
   useKeyOnly,
   useValueAndKey,
@@ -51,16 +54,13 @@ export default class Search extends Component {
     minCharacters: PropTypes.number,
 
     /** Additional text for "No Results" message with less emphasis. */
-    noResultsDescription: PropTypes.string,
+    noResultsDescription: PropTypes.node,
 
     /** Message to display when there are no results. */
-    noResultsMessage: PropTypes.string,
+    noResultsMessage: PropTypes.node,
 
     /** Controls whether or not the results menu is displayed. */
     open: PropTypes.bool,
-
-    /** Placeholder of the search input. */
-    placeholder: PropTypes.string,
 
     /**
      * One of:
@@ -141,7 +141,7 @@ export default class Search extends Component {
      * Called on search input change.
      *
      * @param {SyntheticEvent} event - React's original SyntheticEvent.
-     * @param {string} value - Current value of search input.
+     * @param {object} data - All props, includes current value of search input.
      */
     onSearchChange: PropTypes.func,
 
@@ -196,7 +196,6 @@ export default class Search extends Component {
   static Results = SearchResults
 
   componentWillMount() {
-    if (super.componentWillMount) super.componentWillMount()
     debug('componentWillMount()')
     const { open, value } = this.state
 
@@ -286,8 +285,8 @@ export default class Search extends Component {
   handleResultSelect = (e, result) => {
     debug('handleResultSelect()')
     debug(result)
-    const { onResultSelect } = this.props
-    if (onResultSelect) onResultSelect(e, result)
+
+    _.invoke(this.props, 'onResultSelect', e, { ...this.props, result })
   }
 
   closeOnEscape = (e) => {
@@ -317,12 +316,13 @@ export default class Search extends Component {
     debug('selectItemOnEnter()')
     debug(keyboardKey.getName(e))
     if (keyboardKey.getCode(e) !== keyboardKey.Enter) return
-    e.preventDefault()
 
     const result = this.getSelectedResult()
 
     // prevent selecting null if there was no selected item value
     if (!result) return
+
+    e.preventDefault()
 
     // notify the onResultSelect prop that the user is trying to change value
     this.setValue(result.title)
@@ -400,11 +400,11 @@ export default class Search extends Component {
     debug(e.target.value)
     // prevent propagating to this.props.onChange()
     e.stopPropagation()
-    const { onSearchChange, minCharacters } = this.props
+    const { minCharacters } = this.props
     const { open } = this.state
     const newQuery = e.target.value
 
-    if (onSearchChange) onSearchChange(e, newQuery)
+    _.invoke(this.props, 'onSearchChange', e, { ...this.props, value: newQuery })
 
     // open search dropdown on search query
     if (newQuery.length < minCharacters) {
@@ -478,6 +478,7 @@ export default class Search extends Component {
     if (!isBrowser) return
     const menu = document.querySelector('.ui.search.active.visible .results.visible')
     const item = menu.querySelector('.result.active')
+    if (!item) return
     debug(`menu (results): ${menu}`)
     debug(`item (result): ${item}`)
     const isOutOfUpperView = item.offsetTop < menu.scrollTop
@@ -514,20 +515,20 @@ export default class Search extends Component {
   // Render
   // ----------------------------------------
 
-  renderSearchInput = () => {
-    const { icon, input, placeholder } = this.props
+  renderSearchInput = rest => {
+    const { icon, input } = this.props
     const { value } = this.state
 
-    return Input.create(input, {
-      value,
-      placeholder,
+    return Input.create(input, { defaultProps: {
+      ...rest,
+      icon,
+      input: { className: 'prompt', tabIndex: '0', autoComplete: 'off' },
       onBlur: this.handleBlur,
       onChange: this.handleSearchChange,
-      onFocus: this.handleFocus,
       onClick: this.handleInputClick,
-      input: { className: 'prompt', tabIndex: '0', autoComplete: 'off' },
-      icon,
-    })
+      onFocus: this.handleFocus,
+      value,
+    } })
   }
 
   renderNoResults = () => {
@@ -645,8 +646,11 @@ export default class Search extends Component {
       'search',
       className,
     )
-    const rest = getUnhandledProps(Search, this.props)
+    const unhandled = getUnhandledProps(Search, this.props)
     const ElementType = getElementType(Search, this.props)
+    const [htmlInputProps, rest] = partitionHTMLInputProps(unhandled, {
+      htmlProps: htmlInputAttrs,
+    })
 
     return (
       <ElementType
@@ -656,7 +660,7 @@ export default class Search extends Component {
         onFocus={this.handleFocus}
         onMouseDown={this.handleMouseDown}
       >
-        {this.renderSearchInput()}
+        {this.renderSearchInput(htmlInputProps)}
         {this.renderResultsMenu()}
       </ElementType>
     )

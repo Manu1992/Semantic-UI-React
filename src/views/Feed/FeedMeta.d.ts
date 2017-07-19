@@ -1,6 +1,9 @@
 import * as React from 'react';
 
-interface FeedMetaProps {
+import { SemanticShorthandContent, SemanticShorthandItem } from '../..';
+import { FeedLikeProps } from './FeedLike';
+
+export interface FeedMetaProps {
   [key: string]: any;
 
   /** An element type to render as (string or function). */
@@ -13,10 +16,10 @@ interface FeedMetaProps {
   className?: string;
 
   /** Shorthand for primary content. */
-  content?: React.ReactNode;
+  content?: SemanticShorthandContent;
 
   /** Shorthand for FeedLike. */
-  like?: any;
+  like?: SemanticShorthandItem<FeedLikeProps>;
 }
 
 declare const FeedMeta: React.StatelessComponent<FeedMetaProps>;

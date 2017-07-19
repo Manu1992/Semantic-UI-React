@@ -1,10 +1,12 @@
 import * as React from 'react';
 
+import { SemanticShorthandItem} from '../..';
+import { InputProps } from '../../elements/Input';
 import { default as SearchCategory, SearchCategoryProps } from './SearchCategory';
 import { default as SearchResult, SearchResultProps } from './SearchResult';
 import { default as SearchResults } from './SearchResults';
 
-interface SearchProps {
+export interface SearchProps {
   [key: string]: any;
 
   /** An element type to render as (string or function). */
@@ -27,16 +29,13 @@ interface SearchProps {
   minCharacters?: number;
 
   /** Additional text for "No Results" message with less emphasis. */
-  noResultsDescription?: string;
+  noResultsDescription?: React.ReactNode;
 
   /** Message to display when there are no results. */
-  noResultsMessage?: string;
+  noResultsMessage?: React.ReactNode;
 
   /** Controls whether or not the results menu is displayed. */
   open?: boolean;
-
-  /** Placeholder of the search input. */
-  placeholder?: string;
 
   /**
    * One of:
@@ -108,15 +107,15 @@ interface SearchProps {
    * @param {SyntheticEvent} event - React's original SyntheticEvent.
    * @param {object} data - All props.
    */
-  onResultSelect?: (event: React.MouseEvent<HTMLDivElement>, data: SearchResultProps) => void;
+  onResultSelect?: (event: React.MouseEvent<HTMLDivElement>, data: SearchProps) => void;
 
   /**
    * Called on search input change.
    *
    * @param {SyntheticEvent} event - React's original SyntheticEvent.
-   * @param {string} value - Current value of search input.
+   * @param {object} data - All props, includes current value of search input.
    */
-  onSearchChange?: (event: React.MouseEvent<HTMLElement>, value: string) => void;
+  onSearchChange?: (event: React.MouseEvent<HTMLElement>, data: SearchProps) => void;
 
   // ------------------------------------
   // Style
@@ -135,7 +134,7 @@ interface SearchProps {
   fluid?: boolean;
 
   /** A search input can take up the width of its container. */
-  input?: any;
+  input?: SemanticShorthandItem<InputProps>;
 
   /** A search can show a loading indicator. */
   loading?: boolean;
