@@ -4,6 +4,7 @@ import { Datetime } from 'semantic-ui-react'
 const DateRangeExample = () => (
   <Datetime.Range
     defaultValue={[]}
+    dateHandler='moment'
   />
 )
 

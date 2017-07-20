@@ -238,15 +238,15 @@ export default class Datetime extends Component {
 
   toggle = (e) => this.state.open ? this.close(e) : this.open(e)
 
-  handleDateSelection = (e, date, nextMode, rangeStart) => {
-    debug('handleDateSelection()', date, e)
-    console.log('handleDateSelection', date, nextMode, rangeStart)
+  handleDateSelection = (e, {value, nextMode, rangeStart}) => {
+    debug('handleDateSelection()', value, e)
+    console.log('handleDateSelection', value, nextMode, rangeStart)
     // const _date = new this.Date(date)
     e.stopPropagation()
     e.nativeEvent.stopImmediatePropagation()
     // const selectedDate = _date.getDate()
     this.trySetState({
-      value: date,
+      value: value,
       mode: nextMode,
     })
     if (!nextMode) {
@@ -254,7 +254,7 @@ export default class Datetime extends Component {
     }
   }
 
-  onSetMonth = (value, nextMode) => {
+  onSetMonth = (ev, {value, nextMode}) => {
     debug('onSetMonth()', value, nextMode)
     console.log('onSetMonth', value, nextMode)
     this.trySetState({
