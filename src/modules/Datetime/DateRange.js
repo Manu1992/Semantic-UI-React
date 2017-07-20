@@ -168,6 +168,8 @@ export default class DateRange extends Component {
 
     /** Current value as an array of Date object or a string that can be parsed into one. */
     value: PropTypes.arrayOf(customPropTypes.DateValue),
+    defaultMode: PropTypes.string,
+    mode: PropTypes.string
   }
 
   static autoControlledProps = [
@@ -285,8 +287,11 @@ export default class DateRange extends Component {
    * @param  {Date}   date        The selected date
    * @param  {SyntheticEvent} e   React SynthethicEvent
    */
-  handleDateSelection = (rangeItem, e, date) => {
-    debug('handleDateSelection()', rangeItem, date, e)
+  handleDateSelection = (e, params) => {
+    const rangeId = params.rangeId;
+    const date = params.value;
+    console.log('handleDateSelection', rangeId, date)
+    debug('handleDateSelection()', rangeId, date)
     e.stopPropagation()
     const { value, rangeFocus = 0 } = this.state
     e.nativeEvent.stopImmediatePropagation()
@@ -311,11 +316,12 @@ export default class DateRange extends Component {
    * @param  {number} rangeItem Either 0 or 1 for left and right calendars
    * @param  {Date} date        A date in the selected month
    */
-  handleMonthChange = (rangeItem, date) => {
+  handleMonthChange = (ev, {rangeId, value}) => {
+    console.log("handleMonthChange", rangeId, value)
     const months = this.getDisplayMonths()
-    months[rangeItem] = date
+    months[rangeId] = value
     this.trySetState({
-      months,
+      months
     })
   }
 
@@ -324,14 +330,18 @@ export default class DateRange extends Component {
    */
   getFormattedDate(value) {
     value = value || this.state.value
+    console.log("getFormattedDate", value)
     const { date, time } = this.props
-    const _date = new this.Date(value)
-    if (date && time) {
-      return _date.format()
-    } else if (!date && time) {
-      return _date.formatTime(value)
-    }
-    return _date.formatDate(value)
+    const formatted = value.map((d) => {
+      const _date = new this.Date(d)
+      if (date && time) {
+        return _date.format()
+      } else if (!date && time) {
+        return _date.formatTime(d)
+      }
+      return _date.formatDate(d)
+    })
+    return formatted.join(' - ')
   }
 
   /**
@@ -401,6 +411,8 @@ export default class DateRange extends Component {
         value={this.getFormattedDate(value)}
       />
     )
+    console.log("MONTHS", months)
+    // TODO: DATE HANDLER ON THOSE
     return (
       <Popup
         flowing
@@ -420,11 +432,12 @@ export default class DateRange extends Component {
         <Grid columns='equal'>
           <Grid.Column>
             <Calendar
+              rangeId={0}
               value={months[0]}
               dateHandler={this.Date}
               content={this.props.content}
-              onDateSelect={this.handleDateSelection.bind(this, 0)}
-              onChangeMonth={this.handleMonthChange.bind(this, 0)}
+              onDateSelect={this.handleDateSelection}
+              onChangeMonth={this.handleMonthChange}
               timeFormatter={timeFormatter}
               firstDayOfWeek={firstDayOfWeek}
               time={time}
@@ -438,11 +451,12 @@ export default class DateRange extends Component {
           </Grid.Column>
           <Grid.Column>
             <Calendar
+              rangeId={1}
               value={months[1]}
               dateHandler={this.Date}
               content={this.props.content}
-              onDateSelect={this.handleDateSelection.bind(this, 1)}
-              onChangeMonth={this.handleMonthChange.bind(this, 1)}
+              onDateSelect={this.handleDateSelection}
+              onChangeMonth={this.handleMonthChange}
               timeFormatter={timeFormatter}
               firstDayOfWeek={firstDayOfWeek}
               time={time}

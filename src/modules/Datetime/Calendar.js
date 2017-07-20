@@ -84,6 +84,9 @@ export default class Calendar extends Component {
     /** Render two calendars for selecting the start and end of a range. */
     range: PropTypes.bool,
 
+    /** In a DateRange component, this is either 0 for the first calendar or 1 for the second */
+    rangeId: PropTypes.oneOf([0, 1]),
+
     /** Dates until or at selectionEnd are marked as selected. */
     selectionEnd: customPropTypes.DateValue,
 
@@ -161,13 +164,17 @@ export default class Calendar extends Component {
       : value
 
     date.month(month)
-    onDateSelect(e, date.getDate(), nextMode)
+    onDateSelect(e, {
+      ...this.props,
+      value: date.getDate(),
+      nextMode: nextMode,
+    })
     // this.trySetState({
     //   value: date.getDate(),
     //   mode: nextMode,
     // })
     // if (this.props.onChangeMonth) {
-    //   this.props.onChangeMonth(date.day())
+    //   this.props.onChangeMonth(e, {value: date.day()})
     // }
   }
 
@@ -176,7 +183,11 @@ export default class Calendar extends Component {
     const { value, onDateSelect } = this.props
     const date = new this.Date(value)
     date.year(year)
-    onDateSelect(e, date.getDate(), nextMode)
+    onDateSelect(e, {
+      ...this.props,
+      value: date.getDate(),
+      nextMode: nextMode
+    })
   }
 
   setHour = (e, hour, nextMode = 'minute') => {
@@ -184,7 +195,11 @@ export default class Calendar extends Component {
     const { value, onDateSelect } = this.props
     const date = new this.Date(value)
     date.hours(hour)
-    onDateSelect(e, date.getDate(), nextMode)
+    onDateSelect(e, {
+      ...this.props,
+      value: date.getDate(),
+      nextMode: nextMode
+    })
   }
 
   setMinute = (e, minute) => {
@@ -193,7 +208,11 @@ export default class Calendar extends Component {
     const date = new this.Date(value)
     date.minutes(minute)
     const nextMode = this.props.range ? ' day' : null
-    onDateSelect(e, date.getDate(), nextMode)
+    onDateSelect(e, {
+      ...this.props,
+      value: date.getDate(),
+      nextMode: nextMode
+    })
   }
 
   setDay = (e, day) => {
@@ -204,7 +223,12 @@ export default class Calendar extends Component {
 
     const selectedDate = date.getDate()
     const nextMode = time ? 'hour' : null
-    onDateSelect(e, selectedDate, nextMode, range ? date : null)
+    onDateSelect(e, {
+      ...this.props,
+      value: selectedDate,
+      nextMode: nextMode,
+      rangeStart: range ? date : null
+    })
   }
 
   page = (direction) => (e) => {
