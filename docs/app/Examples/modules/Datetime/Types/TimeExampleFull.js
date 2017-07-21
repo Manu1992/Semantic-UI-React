@@ -2,7 +2,15 @@ import React from 'react'
 import { Datetime } from 'semantic-ui-react'
 
 const TimeExampleFull = () => (
-  <Datetime date={false} time defaultValue={new Date()} icon='time' />
+  <Datetime
+    time
+    icon='time'
+    date={false}
+    defaultValue={new Date()}
+    onChange={(e, {value}) => {
+      console.log("Time selected: ", value)
+    }}
+  />
 )
 
 export default TimeExampleFull

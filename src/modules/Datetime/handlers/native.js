@@ -187,7 +187,6 @@ export function getNativeDateHandler(settings = {}) {
       if (value) {
         this.date.setHours(value)
       }
-      console.log('NATIVE', this.date, this.date.getHours())
       return this.date.getHours()
     }
 

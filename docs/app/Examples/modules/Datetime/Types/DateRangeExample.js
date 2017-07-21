@@ -5,6 +5,10 @@ const DateRangeExample = () => (
   <Datetime.Range
     defaultValue={[]}
     dateHandler='moment'
+    name='date_range'
+    onChange={(e, {rangeId, name, value}) => {
+      console.log("Date selected: ", name, rangeId, value)
+    }}
   />
 )
 

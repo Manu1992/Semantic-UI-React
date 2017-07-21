@@ -153,7 +153,6 @@ export default class Calendar extends Component {
   }
 
   setMonth = (e, props) => {
-    console.log('Calendar setMonth()', props)
     e.stopPropagation()
     const { value, page } = props
     const { onDateSelect } = this.props
