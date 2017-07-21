@@ -8,6 +8,10 @@ const DatetimeExampleMoment = () => (
     time
     dateHandler='moment'
     defaultValue={moment.tz('2017-04-24T12:35', 'Europe/London')}
+    name='date_field'
+    onChange={(e, {value}) => {
+      console.log("Date selected:", value)
+    }}
   />
 )
 

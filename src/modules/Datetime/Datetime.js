@@ -108,7 +108,6 @@ export default class Datetime extends Component {
      * @param {SyntheticEvent} event - React's original SyntheticEvent.
      * @param {object} data - All props and proposed value.
      */
-    // TODO: implement
     onChange: PropTypes.func,
 
     /**
@@ -193,6 +192,7 @@ export default class Datetime extends Component {
     timeFormatter: null,  // defaultTimeFormatter,
     date: true,
     time: true,
+    onChange: () => {}
   }
 
   constructor(props) {
@@ -240,23 +240,26 @@ export default class Datetime extends Component {
 
   handleDateSelection = (e, {value, nextMode, rangeStart}) => {
     debug('handleDateSelection()', value, e)
-    console.log('handleDateSelection', value, nextMode, rangeStart)
     // const _date = new this.Date(date)
     e.stopPropagation()
     e.nativeEvent.stopImmediatePropagation()
+    const { onChange } = this.props
     // const selectedDate = _date.getDate()
     this.trySetState({
       value: value,
       mode: nextMode,
     })
     if (!nextMode) {
+      onChange(e, {
+        ...this.props,
+        value: value
+      })
       this.close()
     }
   }
 
   onSetMonth = (ev, {value, nextMode}) => {
     debug('onSetMonth()', value, nextMode)
-    console.log('onSetMonth', value, nextMode)
     this.trySetState({
       value,
       mode: nextMode,

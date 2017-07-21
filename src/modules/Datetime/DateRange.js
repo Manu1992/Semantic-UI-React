@@ -168,8 +168,21 @@ export default class DateRange extends Component {
 
     /** Current value as an array of Date object or a string that can be parsed into one. */
     value: PropTypes.arrayOf(customPropTypes.DateValue),
+    /**
+     * Default mode the calendar starts at
+     * @type {[type]}
+     */
     defaultMode: PropTypes.string,
-    mode: PropTypes.string
+    /**
+     * Current mode of the calendar (month, day, hour)
+     * @type {[type]}
+     */
+    mode: PropTypes.string,
+    /**
+     * Fired when a date is selected
+     * @type {[type]}
+     */
+    onChange: PropTypes.func
   }
 
   static autoControlledProps = [
@@ -213,6 +226,7 @@ export default class DateRange extends Component {
     timeFormatter: null,  // defaultTimeFormatter,
     date: true,
     time: false,
+    onChange: ()=>{}
   }
 
   constructor(props) {
@@ -288,12 +302,12 @@ export default class DateRange extends Component {
    * @param  {SyntheticEvent} e   React SynthethicEvent
    */
   handleDateSelection = (e, params) => {
-    const rangeId = params.rangeId;
-    const date = params.value;
-    console.log('handleDateSelection', rangeId, date)
-    debug('handleDateSelection()', rangeId, date)
     e.stopPropagation()
+    const rangeId = params.rangeId
+    const date = params.value
+    debug('handleDateSelection()', rangeId, date)
     const { value, rangeFocus = 0 } = this.state
+    const { onChange } = this.props
     e.nativeEvent.stopImmediatePropagation()
     const selectedDate = new Date(date)
     const currentRange = value
@@ -306,6 +320,11 @@ export default class DateRange extends Component {
       rangeFocus: 1 - rangeFocus,
       value: currentRange,
     })
+    onChange(e, {
+      ...this.props,
+      rangeId: rangeId,
+      value: currentRange
+    })
     if (rangeFocus === 1) {
       this.close()
     }
@@ -317,7 +336,6 @@ export default class DateRange extends Component {
    * @param  {Date} date        A date in the selected month
    */
   handleMonthChange = (ev, {rangeId, value}) => {
-    console.log("handleMonthChange", rangeId, value)
     const months = this.getDisplayMonths()
     months[rangeId] = value
     this.trySetState({
@@ -330,7 +348,6 @@ export default class DateRange extends Component {
    */
   getFormattedDate(value) {
     value = value || this.state.value
-    console.log("getFormattedDate", value)
     const { date, time } = this.props
     const formatted = value.map((d) => {
       const _date = new this.Date(d)
@@ -411,7 +428,6 @@ export default class DateRange extends Component {
         value={this.getFormattedDate(value)}
       />
     )
-    console.log("MONTHS", months)
     // TODO: DATE HANDLER ON THOSE
     return (
       <Popup
