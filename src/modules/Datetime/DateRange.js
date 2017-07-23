@@ -72,7 +72,7 @@ export default class DateRange extends Component {
      */
     dateFormatter: PropTypes.func,
 
-    dateHandler: PropTypes.function,
+    dateHandler: PropTypes.string,
 
     /** A disabled dropdown menu or item does not allow user interaction. */
     disabled: PropTypes.bool,
@@ -243,9 +243,12 @@ export default class DateRange extends Component {
       timeFormatter,
       timeZone,
     })
-    this.state = {
-      mode: this.getInitialMode(),
-    }
+  }
+
+  componentWillMount() {
+    this.trySetState({
+      mode: this.getInitialMode()
+    })
   }
 
   getInitialMode() {
@@ -349,7 +352,7 @@ export default class DateRange extends Component {
   getFormattedDate(value) {
     value = value || this.state.value
     const { date, time } = this.props
-    const formatted = value.map((d) => {
+    const formatted = (value || []).map((d) => {
       const _date = new this.Date(d)
       if (date && time) {
         return _date.format()
@@ -372,6 +375,9 @@ export default class DateRange extends Component {
   getDisplayMonths() {
     const { value, months } = this.state
     let [left, right] = [...months || []]
+    if (!value) {
+      return [left, right]
+    }
     if (!left && value.length > 0) {
       left = value[0]
     } else if (!left) {
