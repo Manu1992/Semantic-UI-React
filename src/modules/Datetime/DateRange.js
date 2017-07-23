@@ -250,7 +250,7 @@ export default class DateRange extends Component {
       mode: this.getInitialMode()
     })
   }
-  
+
   getInitialMode() {
     const { date, time } = this.props
     return !date && time ? 'hour' : 'day'

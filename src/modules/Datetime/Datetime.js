@@ -214,7 +214,7 @@ export default class Datetime extends Component {
   componentWillMount() {
     this.trySetState({
       mode: this.getInitialMode()
-    })
+    }) 
   }
 
   getInitialMode() {
@@ -247,6 +247,7 @@ export default class Datetime extends Component {
     e.stopPropagation()
     e.nativeEvent.stopImmediatePropagation()
     const { onChange } = this.props
+
     this.trySetState({
       value: value,
       mode: nextMode,
