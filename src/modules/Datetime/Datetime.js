@@ -209,9 +209,12 @@ export default class Datetime extends Component {
       timeFormatter,
       timeZone,
     })
-    this.state = {
-      mode: this.getInitialMode(),
-    }
+  }
+
+  componentWillMount() {
+    this.trySetState({
+      mode: this.getInitialMode()
+    })
   }
 
   getInitialMode() {
@@ -240,11 +243,10 @@ export default class Datetime extends Component {
 
   handleDateSelection = (e, {value, nextMode, rangeStart}) => {
     debug('handleDateSelection()', value, e)
-    // const _date = new this.Date(date)
+    const _date = new this.Date(value)
     e.stopPropagation()
     e.nativeEvent.stopImmediatePropagation()
     const { onChange } = this.props
-    // const selectedDate = _date.getDate()
     this.trySetState({
       value: value,
       mode: nextMode,

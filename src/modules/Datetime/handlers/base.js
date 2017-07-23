@@ -1,6 +1,6 @@
 /**
  * A root class for Date Handlers.
- * Any new Date handler can be plugged in if it supprots the interface
+ * Any new Date handler can be plugged in if it supports the interface
  * provided by this base class.
  */
 
