@@ -118,8 +118,6 @@ export { default as DropdownSearchInput } from './modules/Dropdown/DropdownSearc
 
 export { default as Datetime } from './modules/Datetime/Datetime'
 
-export { default as Datetime } from './modules/Datetime/Datetime'
-
 export { default as Embed } from './modules/Embed'
 
 export { default as Modal } from './modules/Modal'
